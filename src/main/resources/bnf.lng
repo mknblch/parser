@@ -1,11 +1,19 @@
-%VARIABLE = $\w+\d*
-%NUM = \d+([,\.]\d+)?
-%STRING = ("+).*(\1)
-%OPEN = \(
-%CLOSE = \)
+;; Omit following
+#DELIMITER ::= \s+|;
 
-:VALUE = %STRING | %NUM | %VARIABLE
-:FUNCTION = %STRING %OPEN :VALUE %CLOSE | %STRING %OPEN %CLOSE
+;; Regular Expressions
+%VARIABLE ::= \$\w+\d*
+%NUM ::= \d+([,\.]\d+)?
+%STRING ::= ("+|'+).*(\1)
+%OPEN ::= \(
+%CLOSE ::= \)
+%ID ::= [a-zA-Z]+
 
-!S = :IDENTIFIER :RELATION :VALUE | :IDENTIFIER :FUNCTION
+;; Rules
+VALUE ::= %STRING | %NUM | %VARIABLE
+
+;; Start
+!S ::= %ID %OPEN VALUE %CLOSE
+
+
 
