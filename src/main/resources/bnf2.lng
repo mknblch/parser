@@ -1,0 +1,16 @@
+;; Omit following
+#DELIMITER ::= \s+|;
+
+;; Regular Expressions
+%a ::= a
+%b ::= b
+
+;; Rules
+A ::= %a A | E
+B ::= %b B | E
+
+
+;; Start
+!S ::= A B
+
+
