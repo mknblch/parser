@@ -79,6 +79,7 @@ public class GrammarHelper {
             final Set<String> first = first(symbol);
 
             if (first.contains(epsilon)) {
+                first.remove(epsilon);
                 ret.addAll(first);
                 continue;
             }
