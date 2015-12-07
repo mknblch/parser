@@ -11,10 +11,15 @@ public class Grammar {
     public final String startSymbol;
     public final Map<String, Pattern> patternMap;
     public final Map<String, List<List<String>>> ruleMap;
-    public final Map<List<String>, Set<String>> firstSet;
+    public final Map<String, Set<String>> firstSet;
     public final Map<String, Set<String>> followSet;
 
-    public Grammar(String startSymbol, Map<String, Pattern> patternMap, Map<String, List<List<String>>> ruleMap, Map<List<String>, Set<String>> firstSet, Map<String, Set<String>> followSet) {
+    public Grammar(String startSymbol,
+                   Map<String, Pattern> patternMap,
+                   Map<String, List<List<String>>> ruleMap,
+                   Map<String, Set<String>> firstSet,
+                   Map<String, Set<String>> followSet) {
+
         this.startSymbol = startSymbol;
         this.patternMap = patternMap;
         this.ruleMap = ruleMap;
@@ -45,11 +50,11 @@ public class Grammar {
         }
 
         buffer.append("FIRST:\n");
-        for (List<String> rule : firstSet.keySet()) {
+        for (String symbol : firstSet.keySet()) {
             buffer.append("\t")
-                    .append(collectionToString(rule))
+                    .append(startSymbol)
                     .append(" -> ")
-                    .append(firstSet.get(rule))
+                    .append(firstSet.get(symbol))
                     .append("\n");
         }
 

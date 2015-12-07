@@ -60,10 +60,12 @@ public class GrammarReader {
         final Map<String, Pattern> patternMap = makePatternMap(cache);
         final Map<String, List<List<String>>> ruleMap = makeRuleBag(cache);
 
-        final GrammarHelper grammarHelper = new GrammarHelper(ruleMap)
+        final String startSymbol = startSymbolOptional.get();
+
+
+        final GrammarHelper grammarHelper = new GrammarHelper(startSymbol, patternMap, ruleMap)
                 .setEpsilon(EPSILON);
 
-        final String startSymbol = startSymbolOptional.get();
         return new Grammar(
                 startSymbol,
                 patternMap,

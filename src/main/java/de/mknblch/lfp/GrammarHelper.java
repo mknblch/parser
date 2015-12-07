@@ -4,6 +4,7 @@ import com.sun.org.apache.bcel.internal.generic.RET;
 
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -11,13 +12,20 @@ import java.util.stream.Collectors;
  */
 public class GrammarHelper {
 
-    public final Map<String, List<List<String>>> ruleMap;
+    private final String startSymbol;
+    private final Map<String, Pattern> patternMap;
+    private final Map<String, List<List<String>>> ruleMap;
 
     private String epsilon = "EPSILON";
 
     private static final Set<String> EPSILON_SET = Collections.emptySet();
 
-    public GrammarHelper(Map<String, List<List<String>>> ruleMap) {
+    public GrammarHelper(String startSymbol,
+                         Map<String, Pattern> patternMap,
+                         Map<String, List<List<String>>> ruleMap) {
+
+        this.startSymbol = startSymbol;
+        this.patternMap = patternMap;
         this.ruleMap = ruleMap;
     }
 
@@ -30,17 +38,13 @@ public class GrammarHelper {
         return this;
     }
 
-    public Map<List<String>, Set<String>> first() throws GrammarException {
-        final Map<List<String>, Set<String>> firstMap = new HashMap<>();
+    public Map<String, Set<String>> first() throws GrammarException {
+        final Map<String, Set<String>> firstMap = new HashMap<>();
         for (String nonTerminal : ruleMap.keySet()) {
-            final ArrayList<String> idList = new ArrayList<String>() {{
-                add(nonTerminal);
-            }};
-            firstMap.put(idList, first(nonTerminal));
-
-            for (List<String> rule : ruleMap.get(nonTerminal)) {
-                firstMap.put(rule, first(rule));
-            }
+            firstMap.put(nonTerminal, first(nonTerminal));
+        }
+        for (String terminal : patternMap.keySet()) {
+            firstMap.put(terminal, first(terminal));
         }
         return firstMap;
     }
@@ -49,6 +53,12 @@ public class GrammarHelper {
 
         // make epsilon
         final HashSet<String> firsts = new HashSet<>();
+
+        if (isTerminal(symbol)) {
+            firsts.add(symbol);
+            return firsts;
+        }
+
         if (epsilon.equals(symbol)) {
             firsts.add(symbol);
             return firsts;
@@ -105,7 +115,7 @@ public class GrammarHelper {
     }
 
     private boolean isTerminal(String symbol) {
-        return symbol.startsWith(GrammarReader.TERMINAL_PREFIX);
+        return symbol.startsWith(GrammarReader.TERMINAL_PREFIX) || symbol.startsWith(GrammarReader.EXCLUDE_PREFIX);
     }
 
     public Map<String, Set<String>> follow(String startSymbol) {
@@ -134,14 +144,14 @@ public class GrammarHelper {
 
     private Set<String> follow(String symbol, List<String> rule) {
 
-        for (int i = 0; i < rule.size(); i++) {
-            if (!symbol.equals(rule.get(i))) {
-                continue;
-            }
+        final int firstIndexOfSymbol = rule.indexOf(symbol);
 
-            if (i < rule.size() - 1) {
-
-            }
+        if (firstIndexOfSymbol == -1) {
+            return Collections.emptySet();
         }
+
+
+
+        return null;
     }
 }
