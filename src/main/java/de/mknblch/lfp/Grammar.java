@@ -52,9 +52,18 @@ public class Grammar {
         buffer.append("FIRST:\n");
         for (String symbol : firstSet.keySet()) {
             buffer.append("\t")
-                    .append(startSymbol)
+                    .append(symbol)
                     .append(" -> ")
                     .append(firstSet.get(symbol))
+                    .append("\n");
+        }
+
+        buffer.append("FOLLOW:\n");
+        for (String symbol : followSet.keySet()) {
+            buffer.append("\t")
+                    .append(symbol)
+                    .append(" -> ")
+                    .append(followSet.get(symbol))
                     .append("\n");
         }
 

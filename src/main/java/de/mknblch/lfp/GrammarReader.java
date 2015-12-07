@@ -88,14 +88,18 @@ public class GrammarReader {
     private Map<String, List<List<String>>> makeRuleBag(Map<String, String> cache) {
         return cache.entrySet().stream()
                     // include everything but terminal expressions
-                    .filter(e -> !isTerminal(e))
+                    .filter(e -> !isTerminal(e) && !isExcludeToken(e))
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             this::makeRuleList));
     }
 
     private boolean isTerminal(Map.Entry<String, String> e) {
-        return e.getKey().startsWith(TERMINAL_PREFIX) || e.getKey().startsWith(EXCLUDE_PREFIX);
+        return e.getKey().startsWith(TERMINAL_PREFIX);
+    }
+
+    private boolean isExcludeToken(Map.Entry<String, String> e) {
+        return e.getKey().startsWith(EXCLUDE_PREFIX);
     }
 
     /**

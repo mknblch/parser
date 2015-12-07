@@ -44,7 +44,7 @@ public class GrammarHelper {
             firstMap.put(nonTerminal, first(nonTerminal));
         }
         for (String terminal : patternMap.keySet()) {
-            firstMap.put(terminal, first(terminal));
+            firstMap.put(terminal, toSet(terminal));
         }
         return firstMap;
     }
@@ -115,34 +115,30 @@ public class GrammarHelper {
     }
 
     private boolean isTerminal(String symbol) {
-        return symbol.startsWith(GrammarReader.TERMINAL_PREFIX) || symbol.startsWith(GrammarReader.EXCLUDE_PREFIX);
+        return symbol.startsWith(GrammarReader.TERMINAL_PREFIX) ;
     }
 
-    public Map<String, Set<String>> follow(String startSymbol) {
+    public Map<String, Set<String>> follow(String startSymbol) throws GrammarException {
 
         final HashMap<String, Set<String>> ret = new HashMap<>();
-
-
         for (String symbol : ruleMap.keySet()) {
             // Start symbol
             if (startSymbol.equals(symbol)) {
                 ret.put(startSymbol, toSet("$"));
                 continue;
             }
-
-            final Set<String> follows = ruleMap.values().parallelStream()
-                    .flatMap(Collection::stream)
-                    .map(rule -> follow(symbol, rule))
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toSet());
-
+            final HashSet<String> follows = new HashSet<>();
+            for (List<List<String>> rules : ruleMap.values()) {
+                for (List<String> rule : rules) {
+                    follows.addAll(follow(symbol, rule));
+                }
+            }
             ret.put(symbol, follows);
         }
-
         return ret;
     }
 
-    private Set<String> follow(String symbol, List<String> rule) {
+    private Set<String> follow(String symbol, List<String> rule) throws GrammarException {
 
         final int firstIndexOfSymbol = rule.indexOf(symbol);
 
@@ -150,8 +146,10 @@ public class GrammarHelper {
             return Collections.emptySet();
         }
 
+        if (firstIndexOfSymbol+1 >= rule.size()) {
+            return toSet(epsilon);
+        }
 
-
-        return null;
+        return first(rule.get(firstIndexOfSymbol + 1));
     }
 }
