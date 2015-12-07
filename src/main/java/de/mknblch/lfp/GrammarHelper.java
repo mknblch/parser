@@ -12,21 +12,12 @@ import java.util.stream.Collectors;
  */
 public class GrammarHelper {
 
-    private final String startSymbol;
-    private final Map<String, Pattern> patternMap;
-    private final Map<String, List<List<String>>> ruleMap;
+    private final Grammar grammar;
+    private String epsilon = "E";
 
-    private String epsilon = "EPSILON";
 
-    private static final Set<String> EPSILON_SET = Collections.emptySet();
-
-    public GrammarHelper(String startSymbol,
-                         Map<String, Pattern> patternMap,
-                         Map<String, List<List<String>>> ruleMap) {
-
-        this.startSymbol = startSymbol;
-        this.patternMap = patternMap;
-        this.ruleMap = ruleMap;
+    public GrammarHelper(Grammar grammar) {
+        this.grammar = grammar;
     }
 
     public String getEpsilon() {
@@ -40,10 +31,10 @@ public class GrammarHelper {
 
     public Map<String, Set<String>> first() throws GrammarException {
         final Map<String, Set<String>> firstMap = new HashMap<>();
-        for (String nonTerminal : ruleMap.keySet()) {
+        for (String nonTerminal : grammar.ruleMap.keySet()) {
             firstMap.put(nonTerminal, first(nonTerminal));
         }
-        for (String terminal : patternMap.keySet()) {
+        for (String terminal : grammar.patternMap.keySet()) {
             firstMap.put(terminal, toSet(terminal));
         }
         return firstMap;
@@ -64,7 +55,7 @@ public class GrammarHelper {
             return firsts;
         }
 
-        final List<List<String>> rules = ruleMap.get(symbol);
+        final List<List<String>> rules = grammar.ruleMap.get(symbol);
         // iterate each rule
         for (List<String> rule : rules) {
             firsts.addAll(first(rule));
@@ -108,27 +99,29 @@ public class GrammarHelper {
     }
 
     private boolean onlyEpsilon(Collection<String> symbols) {
-        if (symbols.size() != 1) {
-            return false;
+        for (String symbol : symbols) {
+            if (!epsilon.equals(symbol)) {
+                return false;
+            }
         }
-        return symbols.iterator().next().equals(epsilon);
+        return true;
     }
 
     private boolean isTerminal(String symbol) {
         return symbol.startsWith(GrammarReader.TERMINAL_PREFIX) ;
     }
 
-    public Map<String, Set<String>> follow(String startSymbol) throws GrammarException {
+    public Map<String, Set<String>> follow() throws GrammarException {
 
         final HashMap<String, Set<String>> ret = new HashMap<>();
-        for (String symbol : ruleMap.keySet()) {
+        for (String symbol : grammar.ruleMap.keySet()) {
             // Start symbol
-            if (startSymbol.equals(symbol)) {
-                ret.put(startSymbol, toSet("$"));
+            if (grammar.startSymbol.equals(symbol)) {
+                ret.put(grammar.startSymbol, toSet("$"));
                 continue;
             }
             final HashSet<String> follows = new HashSet<>();
-            for (List<List<String>> rules : ruleMap.values()) {
+            for (List<List<String>> rules : grammar.ruleMap.values()) {
                 for (List<String> rule : rules) {
                     follows.addAll(follow(symbol, rule));
                 }

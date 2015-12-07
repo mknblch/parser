@@ -58,20 +58,16 @@ public class GrammarReader {
             throw new GrammarException("No start symbol defined");
         }
         final Map<String, Pattern> patternMap = makePatternMap(cache);
+        final Map<String, Pattern> exclusionMap = makeExcludeMap(cache);
         final Map<String, List<List<String>>> ruleMap = makeRuleBag(cache);
 
         final String startSymbol = startSymbolOptional.get();
 
-
-        final GrammarHelper grammarHelper = new GrammarHelper(startSymbol, patternMap, ruleMap)
-                .setEpsilon(EPSILON);
-
         return new Grammar(
                 startSymbol,
+                exclusionMap,
                 patternMap,
-                ruleMap,
-                grammarHelper.first(),
-                grammarHelper.follow(startSymbol));
+                ruleMap);
     }
 
     private Optional<String> findStartSymbol(Map<String, String> cache) {
@@ -120,6 +116,14 @@ public class GrammarReader {
     private Map<String, Pattern> makePatternMap(Map<String, String> cache) {
         return cache.entrySet().stream()
                     .filter(this::isTerminal)
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            (Map.Entry<String, String> e) -> Pattern.compile(e.getValue())));
+    }
+
+    private Map<String, Pattern> makeExcludeMap(Map<String, String> cache) {
+        return cache.entrySet().stream()
+                    .filter(this::isExcludeToken)
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             (Map.Entry<String, String> e) -> Pattern.compile(e.getValue())));

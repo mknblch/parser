@@ -9,22 +9,18 @@ import java.util.regex.Pattern;
 public class Grammar {
 
     public final String startSymbol;
+    public final Map<String, Pattern> exclusionMap;
     public final Map<String, Pattern> patternMap;
     public final Map<String, List<List<String>>> ruleMap;
-    public final Map<String, Set<String>> firstSet;
-    public final Map<String, Set<String>> followSet;
 
     public Grammar(String startSymbol,
-                   Map<String, Pattern> patternMap,
-                   Map<String, List<List<String>>> ruleMap,
-                   Map<String, Set<String>> firstSet,
-                   Map<String, Set<String>> followSet) {
+                   Map<String, Pattern> exclusionMap, Map<String, Pattern> patternMap,
+                   Map<String, List<List<String>>> ruleMap) {
 
         this.startSymbol = startSymbol;
+        this.exclusionMap = exclusionMap;
         this.patternMap = patternMap;
         this.ruleMap = ruleMap;
-        this.firstSet = firstSet;
-        this.followSet = followSet;
     }
 
     @Override
@@ -32,6 +28,14 @@ public class Grammar {
         final StringBuilder buffer = new StringBuilder();
         buffer.append("START SYMBOL: ").append(startSymbol).append("\n");
 
+        buffer.append("EXCLUDES:\n");
+        for (String symbol : exclusionMap.keySet()) {
+            buffer.append("\t")
+                    .append(symbol)
+                    .append(" -> ")
+                    .append(exclusionMap.get(symbol))
+                    .append("\n");
+        }
         buffer.append("TERMINALS:\n");
         for (String terminal : patternMap.keySet()) {
             buffer.append("\t")
@@ -46,24 +50,6 @@ public class Grammar {
                     .append(nonTerminal)
                     .append(" -> ")
                     .append(getRuleDump(nonTerminal))
-                    .append("\n");
-        }
-
-        buffer.append("FIRST:\n");
-        for (String symbol : firstSet.keySet()) {
-            buffer.append("\t")
-                    .append(symbol)
-                    .append(" -> ")
-                    .append(firstSet.get(symbol))
-                    .append("\n");
-        }
-
-        buffer.append("FOLLOW:\n");
-        for (String symbol : followSet.keySet()) {
-            buffer.append("\t")
-                    .append(symbol)
-                    .append(" -> ")
-                    .append(followSet.get(symbol))
                     .append("\n");
         }
 

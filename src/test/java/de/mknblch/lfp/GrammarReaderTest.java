@@ -10,7 +10,7 @@ public class GrammarReaderTest {
     @Test
     public void testRead() throws Exception {
 
-        Grammar grammar = GrammarReader.loadResource("test/resources/bnf.lng");
+        Grammar grammar = GrammarReader.loadResource("bnf.lng");
 
         System.out.println(grammar);
 

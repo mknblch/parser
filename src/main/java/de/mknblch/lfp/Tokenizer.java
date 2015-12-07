@@ -21,21 +21,30 @@ public class Tokenizer {
 
         final ArrayList<Token> tokens = new ArrayList<>();
 
-        mainLoop:
+        outer:
         for (int i = 0; i < input.length(); ) {
             final String rest = input.substring(i);
-            for (Map.Entry<String, Pattern> entry : grammar.patternMap.entrySet()) {
-                final Matcher matcher = entry.getValue().matcher(rest);
-                if (!matcher.find() || matcher.start() != 0) {
+
+            // cut out expressions to exclude
+            for (Map.Entry<String, Pattern> entry : grammar.exclusionMap.entrySet()) {
+                final Matcher matcher = match(rest, entry.getValue());
+                if (null == matcher) {
                     continue;
                 }
                 i += matcher.end();
-                if (!entry.getKey().startsWith(GrammarReader.EXCLUDE_PREFIX)) {
-                    tokens.add(new Token(entry.getKey(), matcher.group(0)));
-                }
-                continue mainLoop;
+                continue outer;
             }
-
+            // match tokens
+            for (Map.Entry<String, Pattern> entry : grammar.patternMap.entrySet()) {
+                final Matcher matcher = match(rest, entry.getValue());
+                if (null == matcher) {
+                    continue;
+                }
+                i += matcher.end();
+                tokens.add(new Token(entry.getKey(), matcher.group(0)));
+                continue outer;
+            }
+            // no possible rule found, throw exception
             throw new GrammarException("Parse Error at " +
                     i +
                     " : '" +
@@ -44,6 +53,18 @@ public class Tokenizer {
         }
 
         return tokens;
+    }
+
+    private Matcher match(CharSequence input, Pattern pattern) {
+        final Matcher matcher = pattern.matcher(input);
+        if (!matcher.find()) {
+            return null;
+        }
+        if (matcher.start() != 0) {
+            return null;
+        }
+        // matched at first char of input
+        return matcher;
     }
 
 }
