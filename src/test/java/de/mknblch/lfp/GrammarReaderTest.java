@@ -1,6 +1,5 @@
 package de.mknblch.lfp;
 
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -11,7 +10,7 @@ public class GrammarReaderTest {
     @Test
     public void testRead() throws Exception {
 
-        Grammar grammar = GrammarReader.loadResource("bnf.lng");
+        Grammar grammar = GrammarReader.loadResource("test/resources/bnf.lng");
 
         System.out.println(grammar);
 

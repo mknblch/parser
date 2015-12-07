@@ -53,20 +53,23 @@ public class GrammarReader {
 
     public Grammar readGrammar(InputStream inputStream) throws GrammarException {
         final Map<String, String> cache = preProcess(inputStream);
-        final Optional<String> startSymbol = findStartSymbol(cache);
-        if (!startSymbol.isPresent()) {
+        final Optional<String> startSymbolOptional = findStartSymbol(cache);
+        if (!startSymbolOptional.isPresent()) {
             throw new GrammarException("No start symbol defined");
         }
         final Map<String, Pattern> patternMap = makePatternMap(cache);
         final Map<String, List<List<String>>> ruleMap = makeRuleBag(cache);
 
+        final GrammarHelper grammarHelper = new GrammarHelper(ruleMap)
+                .setEpsilon(EPSILON);
+
+        final String startSymbol = startSymbolOptional.get();
         return new Grammar(
-                startSymbol.get(),
+                startSymbol,
                 patternMap,
                 ruleMap,
-                new GrammarHelper(ruleMap)
-                        .setEpsilon(EPSILON)
-                        .first());
+                grammarHelper.first(),
+                grammarHelper.follow(startSymbol));
     }
 
     private Optional<String> findStartSymbol(Map<String, String> cache) {

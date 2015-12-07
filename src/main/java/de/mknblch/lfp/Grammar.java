@@ -12,12 +12,14 @@ public class Grammar {
     public final Map<String, Pattern> patternMap;
     public final Map<String, List<List<String>>> ruleMap;
     public final Map<List<String>, Set<String>> firstSet;
+    public final Map<String, Set<String>> followSet;
 
-    public Grammar(String startSymbol, Map<String, Pattern> patternMap, Map<String, List<List<String>>> ruleMap, Map<List<String>, Set<String>> firstSet) {
+    public Grammar(String startSymbol, Map<String, Pattern> patternMap, Map<String, List<List<String>>> ruleMap, Map<List<String>, Set<String>> firstSet, Map<String, Set<String>> followSet) {
         this.startSymbol = startSymbol;
         this.patternMap = patternMap;
         this.ruleMap = ruleMap;
         this.firstSet = firstSet;
+        this.followSet = followSet;
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.sun.org.apache.bcel.internal.generic.RET;
 
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by mknblch on 06.12.2015.
@@ -105,5 +106,42 @@ public class GrammarHelper {
 
     private boolean isTerminal(String symbol) {
         return symbol.startsWith(GrammarReader.TERMINAL_PREFIX);
+    }
+
+    public Map<String, Set<String>> follow(String startSymbol) {
+
+        final HashMap<String, Set<String>> ret = new HashMap<>();
+
+
+        for (String symbol : ruleMap.keySet()) {
+            // Start symbol
+            if (startSymbol.equals(symbol)) {
+                ret.put(startSymbol, toSet("$"));
+                continue;
+            }
+
+            final Set<String> follows = ruleMap.values().parallelStream()
+                    .flatMap(Collection::stream)
+                    .map(rule -> follow(symbol, rule))
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toSet());
+
+            ret.put(symbol, follows);
+        }
+
+        return ret;
+    }
+
+    private Set<String> follow(String symbol, List<String> rule) {
+
+        for (int i = 0; i < rule.size(); i++) {
+            if (!symbol.equals(rule.get(i))) {
+                continue;
+            }
+
+            if (i < rule.size() - 1) {
+
+            }
+        }
     }
 }
