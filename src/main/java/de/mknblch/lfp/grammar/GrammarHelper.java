@@ -29,9 +29,7 @@ public class GrammarHelper {
         for (String nonTerminal : grammar.ruleMap.keySet()) {
             firstMap.put(nonTerminal, first(nonTerminal));
         }
-        for (String terminal : grammar.patternMap.keySet()) {
-            firstMap.put(terminal, toSet(terminal));
-        }
+
         return firstMap;
     }
 
@@ -40,7 +38,7 @@ public class GrammarHelper {
         // make epsilon
         final HashSet<String> firsts = new HashSet<>();
 
-        if (isTerminal(symbol)) {
+        if (grammar.isTerminal(symbol)) {
             firsts.add(symbol);
             return firsts;
         }
@@ -59,31 +57,34 @@ public class GrammarHelper {
     }
 
     private Set<String> first(List<String> rule) throws GrammarException {
+        return first(rule, 0);
+    }
+
+    private Set<String> first(List<String> rule, int index) throws GrammarException {
 
         final Set<String> ret = new HashSet<>();
-        if (onlyEpsilon(rule)) {
+        if (isEpsilonRule(rule)) {
             ret.add(epsilon);
             return ret;
         }
 
-        for (final String symbol : rule) {
-
-            if (isTerminal(symbol)) {
-                ret.add(symbol);
-                return ret;
-            }
-
-            final Set<String> first = first(symbol);
-
-            if (first.contains(epsilon)) {
-                first.remove(epsilon);
-                ret.addAll(first);
-                continue;
-            }
-            return first;
+        if (index > rule.size()) {
+            return ret;
         }
 
-        ret.add(epsilon);
+        final String symbol = rule.get(index);
+        if (grammar.isTerminal(symbol)) {
+            ret.add(symbol);
+            return ret;
+        }
+
+        final Set<String> first = first(symbol);
+        ret.addAll(first);
+
+        if (first.contains(epsilon)) {
+            ret.addAll(first(rule, index + 1));
+        }
+
         return ret;
     }
 
@@ -93,17 +94,9 @@ public class GrammarHelper {
             }};
     }
 
-    private boolean onlyEpsilon(Collection<String> symbols) {
-        for (String symbol : symbols) {
-            if (!epsilon.equals(symbol)) {
-                return false;
-            }
-        }
-        return true;
-    }
+    private boolean isEpsilonRule(Collection<String> symbols) {
 
-    private boolean isTerminal(String symbol) {
-        return symbol.startsWith(GrammarReader.TERMINAL_PREFIX) ;
+        return symbols.stream().allMatch(epsilon::equals);
     }
 
     public Map<String, Set<String>> follow() throws GrammarException {

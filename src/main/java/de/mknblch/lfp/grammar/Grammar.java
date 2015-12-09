@@ -27,6 +27,7 @@ public class Grammar {
         return patternMap.containsKey(symbol);
     }
 
+
     @Override
     public String toString() {
         final StringBuilder buffer = new StringBuilder();
