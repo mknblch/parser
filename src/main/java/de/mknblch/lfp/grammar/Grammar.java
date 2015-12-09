@@ -11,11 +11,11 @@ public class Grammar {
     public final String startSymbol;
     public final Map<String, Pattern> exclusionMap;
     public final Map<String, Pattern> patternMap;
-    public final Map<String, List<List<String>>> ruleMap;
+    public final Map<String, List<Rule>> ruleMap;
 
     public Grammar(String startSymbol,
                    Map<String, Pattern> exclusionMap, Map<String, Pattern> patternMap,
-                   Map<String, List<List<String>>> ruleMap) {
+                   Map<String, List<Rule>> ruleMap) {
 
         this.startSymbol = startSymbol;
         this.exclusionMap = exclusionMap;
@@ -61,26 +61,15 @@ public class Grammar {
         return buffer.toString();
     }
 
-    private String collectionToString(Collection<String> list) {
-        final StringBuilder buffer = new StringBuilder();
-        for (String symbol : list) {
-            if (buffer.length() != 0) {
-                buffer.append(" ");
-            }
-            buffer.append(symbol);
-        }
-        return buffer.toString();
-    }
-
     private String getRuleDump(String nonTerminal) {
-        final List<List<String>> rules = ruleMap.get(nonTerminal);
+        final List<Rule> rules = ruleMap.get(nonTerminal);
         final StringBuilder buffer = new StringBuilder();
 
-        for (List<String> rule : rules) {
+        for (Rule rule : rules) {
             if (buffer.length() != 0) {
                 buffer.append(" | ");
             }
-            buffer.append(collectionToString(rule));
+            buffer.append(rule);
         }
         return buffer.toString();
     }

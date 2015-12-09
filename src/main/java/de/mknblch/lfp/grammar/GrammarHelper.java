@@ -48,19 +48,19 @@ public class GrammarHelper {
             return firsts;
         }
 
-        final List<List<String>> rules = grammar.ruleMap.get(symbol);
+        final List<Rule> rules = grammar.ruleMap.get(symbol);
         // iterate each rule
-        for (List<String> rule : rules) {
+        for (Rule rule : rules) {
             firsts.addAll(first(rule));
         }
         return firsts;
     }
 
-    private Set<String> first(List<String> rule) throws GrammarException {
+    private Set<String> first(Rule rule) throws GrammarException {
         return first(rule, 0);
     }
 
-    private Set<String> first(List<String> rule, int index) throws GrammarException {
+    private Set<String> first(Rule rule, int index) throws GrammarException {
 
         final Set<String> ret = new HashSet<>();
         if (isEpsilonRule(rule)) {
@@ -94,9 +94,9 @@ public class GrammarHelper {
             }};
     }
 
-    private boolean isEpsilonRule(Collection<String> symbols) {
+    private boolean isEpsilonRule(Rule rule) {
 
-        return symbols.stream().allMatch(epsilon::equals);
+        return rule.allEquals(epsilon);
     }
 
     public Map<String, Set<String>> follow() throws GrammarException {
@@ -109,8 +109,8 @@ public class GrammarHelper {
                 continue;
             }
             final HashSet<String> follows = new HashSet<>();
-            for (List<List<String>> rules : grammar.ruleMap.values()) {
-                for (List<String> rule : rules) {
+            for (List<Rule> rules : grammar.ruleMap.values()) {
+                for (Rule rule : rules) {
                     follows.addAll(follow(symbol, rule));
                 }
             }
@@ -119,7 +119,7 @@ public class GrammarHelper {
         return ret;
     }
 
-    private Set<String> follow(String symbol, List<String> rule) throws GrammarException {
+    private Set<String> follow(String symbol, Rule rule) throws GrammarException {
 
         final int firstIndexOfSymbol = rule.indexOf(symbol);
 
