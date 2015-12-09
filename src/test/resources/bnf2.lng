@@ -6,11 +6,11 @@
 %b ::= b
 
 ;; Rules
-A ::= %a A | B
-B ::= %b B | E
+A ::= %a | E
+B ::= %b | %c
 
 
 ;; Start
-!S ::= A B
+!S ::= A B A
 
 

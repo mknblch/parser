@@ -1,4 +1,7 @@
-package de.mknblch.lfp;
+package de.mknblch.lfp.lexer;
+
+import de.mknblch.lfp.grammar.Grammar;
+import de.mknblch.lfp.grammar.GrammarException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,11 +12,11 @@ import java.util.regex.Pattern;
 /**
  * Created by mknblch on 05.12.2015.
  */
-public class Tokenizer {
+public class Lexer {
 
     private final Grammar grammar;
 
-    public Tokenizer(Grammar grammar) {
+    public Lexer(Grammar grammar) {
         this.grammar = grammar;
     }
 

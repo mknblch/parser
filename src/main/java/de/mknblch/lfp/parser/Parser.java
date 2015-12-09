@@ -1,6 +1,6 @@
-package de.mknblch.lfp;
+package de.mknblch.lfp.parser;
 
-import java.util.List;
+import de.mknblch.lfp.grammar.Grammar;
 
 /**
  * Created by mknblch on 05.12.2015.

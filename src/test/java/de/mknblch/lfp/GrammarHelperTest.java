@@ -1,12 +1,9 @@
 package de.mknblch.lfp;
 
+import de.mknblch.lfp.grammar.GrammarHelper;
+import de.mknblch.lfp.grammar.GrammarReader;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Map;
-import java.util.Set;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by mknblch on 07.12.2015.

@@ -1,4 +1,4 @@
-package de.mknblch.lfp;
+package de.mknblch.lfp.grammar;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -21,6 +21,10 @@ public class Grammar {
         this.exclusionMap = exclusionMap;
         this.patternMap = patternMap;
         this.ruleMap = ruleMap;
+    }
+
+    public boolean isTerminal(String symbol) {
+        return patternMap.containsKey(symbol);
     }
 
     @Override

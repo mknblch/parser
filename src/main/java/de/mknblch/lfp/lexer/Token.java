@@ -1,4 +1,4 @@
-package de.mknblch.lfp;
+package de.mknblch.lfp.lexer;
 
 /**
  * Created by mknblch on 05.12.2015.

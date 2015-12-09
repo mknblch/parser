@@ -1,4 +1,4 @@
-package de.mknblch.lfp;
+package de.mknblch.lfp.grammar;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

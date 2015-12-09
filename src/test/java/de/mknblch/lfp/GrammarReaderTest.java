@@ -1,5 +1,7 @@
 package de.mknblch.lfp;
 
+import de.mknblch.lfp.grammar.Grammar;
+import de.mknblch.lfp.grammar.GrammarReader;
 import org.junit.Test;
 
 /**

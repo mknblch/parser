@@ -1,11 +1,6 @@
-package de.mknblch.lfp;
+package de.mknblch.lfp.grammar;
 
-import com.sun.org.apache.bcel.internal.generic.RET;
-
-import java.nio.charset.Charset;
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Created by mknblch on 06.12.2015.
