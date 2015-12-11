@@ -9,13 +9,13 @@ import java.util.*;
 /**
  * Created by mknblch on 06.12.2015.
  */
-public class GrammarHelper {
+public class FirstFollowCalc {
 
     private final Grammar grammar;
     private String epsilon = "E";
 
 
-    public GrammarHelper(Grammar grammar) {
+    public FirstFollowCalc(Grammar grammar) {
         this.grammar = grammar;
     }
 
@@ -23,7 +23,7 @@ public class GrammarHelper {
         return epsilon;
     }
 
-    public GrammarHelper setEpsilon(String epsilon) {
+    public FirstFollowCalc setEpsilon(String epsilon) {
         this.epsilon = epsilon;
         return this;
     }
@@ -139,14 +139,4 @@ public class GrammarHelper {
         return first(rule.get(firstIndexOfSymbol + 1));
     }
 
-    public ParseTable ll1() {
-
-        final ParseTable table = new ParseTable();
-
-        for (String nonTerminal : grammar.ruleMap.keySet()) {
-
-
-        }
-
-    }
 }

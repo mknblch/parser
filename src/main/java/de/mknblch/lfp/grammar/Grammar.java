@@ -27,6 +27,14 @@ public class Grammar {
         return patternMap.containsKey(symbol);
     }
 
+    public Set<String> terminals() {
+        return patternMap.keySet();
+    }
+
+    public Set<String> nonTerminals() {
+        return ruleMap.keySet();
+    }
+
 
     @Override
     public String toString() {
