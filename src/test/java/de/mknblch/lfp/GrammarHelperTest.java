@@ -1,6 +1,6 @@
 package de.mknblch.lfp;
 
-import de.mknblch.lfp.grammar.GrammarHelper;
+import de.mknblch.lfp.parser.GrammarHelper;
 import de.mknblch.lfp.grammar.GrammarReader;
 import org.junit.Before;
 import org.junit.Test;

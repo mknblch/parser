@@ -1,4 +1,8 @@
-package de.mknblch.lfp.grammar;
+package de.mknblch.lfp.parser;
+
+import de.mknblch.lfp.grammar.Grammar;
+import de.mknblch.lfp.grammar.GrammarException;
+import de.mknblch.lfp.grammar.Rule;
 
 import java.util.*;
 
@@ -133,5 +137,11 @@ public class GrammarHelper {
         }
 
         return first(rule.get(firstIndexOfSymbol + 1));
+    }
+
+    public ParseTable ll1() {
+
+
+
     }
 }
