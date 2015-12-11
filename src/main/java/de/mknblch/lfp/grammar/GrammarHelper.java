@@ -68,7 +68,7 @@ public class GrammarHelper {
             return ret;
         }
 
-        if (index > rule.size()) {
+        if (index >= rule.size()) {
             return ret;
         }
 
@@ -79,11 +79,12 @@ public class GrammarHelper {
         }
 
         final Set<String> first = first(symbol);
-        ret.addAll(first);
 
         if (first.contains(epsilon)) {
+            first.remove(epsilon);
             ret.addAll(first(rule, index + 1));
         }
+        ret.addAll(first);
 
         return ret;
     }

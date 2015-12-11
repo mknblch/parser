@@ -24,7 +24,6 @@ public class GrammarReader {
     public static final String EXCLUDE_PREFIX = "#";
     public static final String TERMINAL_PREFIX = "%";
     public static final String START_PREFIX = "!";
-    public static final String EPSILON = "E";
 
     private static final Pattern COMMENT_PATTERN = Pattern.compile("\\s*;.*");
 
@@ -59,7 +58,7 @@ public class GrammarReader {
         }
         final Map<String, Pattern> patternMap = makePatternMap(cache);
         final Map<String, Pattern> exclusionMap = makeExcludeMap(cache);
-        final Map<String, List<List<String>>> ruleMap = makeRuleBag(cache);
+        final Map<String, List<Rule>> ruleMap = makeRuleBag(cache);
 
         final String startSymbol = startSymbolOptional.get();
 
@@ -81,9 +80,9 @@ public class GrammarReader {
      * @param cache
      * @return
      */
-    private Map<String, List<List<String>>> makeRuleBag(Map<String, String> cache) {
+    private Map<String, List<Rule>> makeRuleBag(Map<String, String> cache) {
         return cache.entrySet().stream()
-                    // include everything but terminal expressions
+                    // filter non terminals
                     .filter(e -> !isTerminal(e) && !isExcludeToken(e))
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
@@ -103,12 +102,12 @@ public class GrammarReader {
      * @param entry
      * @return
      */
-    private List<List<String>> makeRuleList(Map.Entry<String, String> entry) {
+    private List<Rule> makeRuleList(Map.Entry<String, String> entry) {
         final String value = entry.getValue();
         final String[] split = value.split("\\s*\\|\\s*");
-        final ArrayList<List<String>> rules = new ArrayList<>(split.length);
+        final ArrayList<Rule> rules = new ArrayList<>(split.length);
         for (String rule : split) {
-            rules.add(Arrays.asList(rule.split("\\s+")));
+            rules.add(new Rule(rule.split("\\s+")));
         }
         return rules;
     }

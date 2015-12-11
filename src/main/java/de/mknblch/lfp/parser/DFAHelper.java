@@ -1,6 +1,7 @@
 package de.mknblch.lfp.parser;
 
 import de.mknblch.lfp.grammar.Grammar;
+import de.mknblch.lfp.grammar.Rule;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,14 +27,14 @@ public class DFAHelper {
         }
 
         for (Map.Entry<String, State> entry : states.entrySet()) {
-            final List<List<String>> prodRules = grammar.ruleMap.get(entry.getKey());
-            for (List<String> rule : prodRules) {
+            final List<Rule> prodRules = grammar.ruleMap.get(entry.getKey());
+            for (Rule rule : prodRules) {
                 processRule(entry.getValue(), rule);
             }
         }
     }
 
-    private void processRule(State state, List<String> rule) {
+    private void processRule(State state, Rule rule) {
 
 
     }
