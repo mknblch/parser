@@ -107,7 +107,7 @@ public class GrammarHelper {
     public Map<String, Set<String>> follow() throws GrammarException {
 
         final HashMap<String, Set<String>> ret = new HashMap<>();
-        for (String symbol : grammar.ruleMap.keySet()) {
+        for (final String symbol : grammar.ruleMap.keySet()) {
             // Start symbol
             if (grammar.startSymbol.equals(symbol)) {
                 ret.put(grammar.startSymbol, toSet("$"));
@@ -141,7 +141,12 @@ public class GrammarHelper {
 
     public ParseTable ll1() {
 
+        final ParseTable table = new ParseTable();
 
+        for (String nonTerminal : grammar.ruleMap.keySet()) {
+
+
+        }
 
     }
 }
