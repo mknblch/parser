@@ -31,7 +31,7 @@ public class GrammarReader {
 
     private static final Pattern COMMENT_PATTERN = Pattern.compile("\\s*;.*");
     private static final Pattern LINE_PATTERN =
-            Pattern.compile("([" + TERMINAL_PREFIX + OPTION_PREFIX + EXCLUDE_PREFIX + "]?\\w+)\\s*"+DELIMITER+"\\s*(.+)");
+            Pattern.compile("([^:= ]+)\\s*"+DELIMITER+"\\s*(.+)");
 
     private Map<String, String> preProcess(InputStream iStream) throws GrammarException {
         final Scanner scanner = new Scanner(iStream)

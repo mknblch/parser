@@ -2,6 +2,7 @@ package de.mknblch.lfp.grammar;
 
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by mknblch on 05.12.2015.
@@ -36,6 +37,7 @@ public class Grammar {
     public boolean isEpsilon(String symbol) {
         return epsilonSymbol.equals(symbol);
     }
+
     public boolean isTerminal(String symbol) {
         return patternMap.containsKey(symbol);
     }
@@ -48,6 +50,12 @@ public class Grammar {
         return ruleMap.keySet();
     }
 
+    public Set<String> nullable() {
+        return ruleMap.keySet()
+                .stream()
+                .filter(this::isNullable)
+                .collect(Collectors.toSet());
+    }
 
     @Override
     public String toString() {

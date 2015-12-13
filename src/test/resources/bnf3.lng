@@ -13,8 +13,7 @@
 %cb ::= \)
 
 ;; Rules
-S ::= T K
-K ::= %plus T K | E
-T ::= F G
-G ::= %mul F G | E
-F ::= %ob S %cb | %num
+S ::= T X
+T ::= %ob S %cb | %num Y
+X ::= %plus S | E
+Y ::= %mul T | E

@@ -104,17 +104,26 @@ public class FirstFollowCalc {
                 followSet.put(grammar.startSymbol, toSet("$"));
                 continue;
             }
-            final HashSet<String> follows = new HashSet<>();
-            for (List<Rule> rules : grammar.ruleMap.values()) {
-                for (Rule rule : rules) {
-                    follows.addAll(follow(find, rule));
-                }
-            }
-            followSet.put(find, follows);
+            followSet.put(find, follow(find));
 
 
         }
         return followSet;
+    }
+
+    private HashSet<String> follow(String find) throws GrammarException {
+        final HashSet<String> follows = new HashSet<>();
+        for (List<Rule> rules : grammar.ruleMap.values()) {
+            for (Rule rule : rules) {
+
+                if (rule.left.equals(find)) {
+                    continue;
+                }
+
+                follows.addAll(follow(find, rule));
+            }
+        }
+        return follows;
     }
 
     private Set<String> follow(String find, Rule rule) throws GrammarException {
@@ -130,13 +139,6 @@ public class FirstFollowCalc {
 
         final HashSet<String> set = new HashSet<>();
 
-        // symbol found at end
-        if (index == rule.size() - 1) {
-            return toSet("$");
-        }
-
-
-
         for (int i = index + 1; i < rule.size(); i++) {
 
             final Set<String> first = first(rule, i);
@@ -149,7 +151,7 @@ public class FirstFollowCalc {
             }
         }
 
-        set.add("$");
+        set.addAll(follow(rule.left));
 
         return set;
     }
