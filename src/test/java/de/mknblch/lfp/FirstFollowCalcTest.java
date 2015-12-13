@@ -45,8 +45,8 @@ public class FirstFollowCalcTest {
         assertContains(follow.get("B"), "%c");
         assertContains(follow.get("C"), "%d", "%e", "$");
         assertContains(follow.get("D"), "%e", "$");
-        assertContains(follow.get("E"), "$");
         assertContains(follow.get("S"), "$");
+        assertContains(follow.get("E"), "$");
 
     }
 
