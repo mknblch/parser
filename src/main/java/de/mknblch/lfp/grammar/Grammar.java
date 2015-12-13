@@ -9,20 +9,33 @@ import java.util.regex.Pattern;
 public class Grammar {
 
     public final String startSymbol;
+    public final String epsilonSymbol;
     public final Map<String, Pattern> exclusionMap;
     public final Map<String, Pattern> patternMap;
     public final Map<String, List<Rule>> ruleMap;
 
     public Grammar(String startSymbol,
-                   Map<String, Pattern> exclusionMap, Map<String, Pattern> patternMap,
+                   String epsilonSymbol, Map<String, Pattern> exclusionMap, Map<String, Pattern> patternMap,
                    Map<String, List<Rule>> ruleMap) {
 
         this.startSymbol = startSymbol;
+        this.epsilonSymbol = epsilonSymbol;
         this.exclusionMap = exclusionMap;
         this.patternMap = patternMap;
         this.ruleMap = ruleMap;
     }
 
+    public boolean isNullable(String symbol) {
+        return ruleMap.get(symbol).stream().anyMatch(this::isNullable);
+    }
+
+    public boolean isNullable(Rule rule) {
+        return rule.size() == 1 && rule.allEquals(epsilonSymbol);
+    }
+
+    public boolean isEpsilon(String symbol) {
+        return epsilonSymbol.equals(symbol);
+    }
     public boolean isTerminal(String symbol) {
         return patternMap.containsKey(symbol);
     }
@@ -39,7 +52,11 @@ public class Grammar {
     @Override
     public String toString() {
         final StringBuilder buffer = new StringBuilder();
-        buffer.append("START SYMBOL: ").append(startSymbol).append("\n");
+
+        buffer.append("OPTIONS:").append("\n");
+
+        buffer.append("\tSTART -> ").append(startSymbol).append("\n");
+        buffer.append("\tEPSILON -> ").append(epsilonSymbol).append("\n");
 
         buffer.append("EXCLUDES:\n");
         for (String symbol : exclusionMap.keySet()) {

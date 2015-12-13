@@ -23,11 +23,11 @@ public class ParseTableCalc {
         followSet = calc.follow();
     }
 
-    public ParseTable build() {
-
-        for (String nonTerminal : grammar.nonTerminals()) {
-
-
-        }
-    }
+//    public ParseTable build() {
+//
+//        for (String nonTerminal : grammar.nonTerminals()) {
+//
+//
+//        }
+//    }
 }

@@ -61,7 +61,6 @@ public class Table<R, C, V> {
                 .collect(Collectors.toSet());
     }
 
-
     public Set<C> getColumns() {
         return map.keySet().stream()
                 .map(Key::getColumn)

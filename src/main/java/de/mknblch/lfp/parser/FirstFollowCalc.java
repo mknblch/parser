@@ -12,20 +12,10 @@ import java.util.*;
 public class FirstFollowCalc {
 
     private final Grammar grammar;
-    private String epsilon = "E";
 
 
     public FirstFollowCalc(Grammar grammar) {
         this.grammar = grammar;
-    }
-
-    public String getEpsilon() {
-        return epsilon;
-    }
-
-    public FirstFollowCalc setEpsilon(String epsilon) {
-        this.epsilon = epsilon;
-        return this;
     }
 
     public Map<String, Set<String>> first() throws GrammarException {
@@ -39,25 +29,24 @@ public class FirstFollowCalc {
 
     private Set<String> first(String symbol) throws GrammarException {
 
-        // make epsilon
-        final HashSet<String> firsts = new HashSet<>();
+        final HashSet<String> firstSet = new HashSet<>();
 
         if (grammar.isTerminal(symbol)) {
-            firsts.add(symbol);
-            return firsts;
+            firstSet.add(symbol);
+            return firstSet;
         }
 
-        if (epsilon.equals(symbol)) {
-            firsts.add(symbol);
-            return firsts;
+        if (grammar.isEpsilon(symbol)) {
+            firstSet.add(symbol);
+            return firstSet;
         }
 
         final List<Rule> rules = grammar.ruleMap.get(symbol);
         // iterate each rule
         for (Rule rule : rules) {
-            firsts.addAll(first(rule));
+            firstSet.addAll(first(rule));
         }
-        return firsts;
+        return firstSet;
     }
 
     private Set<String> first(Rule rule) throws GrammarException {
@@ -68,7 +57,7 @@ public class FirstFollowCalc {
 
         final Set<String> ret = new HashSet<>();
         if (isEpsilonRule(rule)) {
-            ret.add(epsilon);
+            ret.add(grammar.epsilonSymbol);
             return ret;
         }
 
@@ -84,59 +73,85 @@ public class FirstFollowCalc {
 
         final Set<String> first = first(symbol);
 
-        if (first.contains(epsilon)) {
-            first.remove(epsilon);
+        first.stream()
+                .filter(s -> !grammar.isEpsilon(symbol))
+                .forEach(ret::add);
+
+        if (first.contains(grammar.epsilonSymbol)) {
             ret.addAll(first(rule, index + 1));
         }
-        ret.addAll(first);
 
         return ret;
     }
 
     private Set<String> toSet(String symbol) {
         return new HashSet<String>() {{
-                add(symbol);
-            }};
+            add(symbol);
+        }};
     }
 
     private boolean isEpsilonRule(Rule rule) {
 
-        return rule.allEquals(epsilon);
+        return rule.allEquals(grammar.epsilonSymbol);
     }
 
     public Map<String, Set<String>> follow() throws GrammarException {
 
-        final HashMap<String, Set<String>> ret = new HashMap<>();
-        for (final String symbol : grammar.ruleMap.keySet()) {
+        final HashMap<String, Set<String>> followSet = new HashMap<>();
+        for (final String find : grammar.ruleMap.keySet()) {
             // Start symbol
-            if (grammar.startSymbol.equals(symbol)) {
-                ret.put(grammar.startSymbol, toSet("$"));
+            if (grammar.startSymbol.equals(find)) {
+                followSet.put(grammar.startSymbol, toSet("$"));
                 continue;
             }
             final HashSet<String> follows = new HashSet<>();
             for (List<Rule> rules : grammar.ruleMap.values()) {
                 for (Rule rule : rules) {
-                    follows.addAll(follow(symbol, rule));
+                    follows.addAll(follow(find, rule));
                 }
             }
-            ret.put(symbol, follows);
+            followSet.put(find, follows);
+
+
+        }
+        return followSet;
+    }
+
+    private Set<String> follow(String find, Rule rule) throws GrammarException {
+        final List<Integer> indices = rule.find(find);
+        final HashSet<String> ret = new HashSet<>();
+        for (Integer index : indices) {
+            ret.addAll(follow(rule, index));
         }
         return ret;
     }
 
-    private Set<String> follow(String symbol, Rule rule) throws GrammarException {
+    private Set<String> follow(Rule rule, int index) throws GrammarException {
 
-        final int firstIndexOfSymbol = rule.indexOf(symbol);
+        final HashSet<String> set = new HashSet<>();
 
-        if (firstIndexOfSymbol == -1) {
-            return Collections.emptySet();
+        // symbol found at end
+        if (index == rule.size() - 1) {
+            return toSet("$");
         }
 
-        if (firstIndexOfSymbol+1 >= rule.size()) {
-            return toSet(epsilon);
+
+
+        for (int i = index + 1; i < rule.size(); i++) {
+
+            final Set<String> first = first(rule, i);
+
+            set.addAll(first);
+            set.remove(grammar.epsilonSymbol);
+
+            if (!first.contains(grammar.epsilonSymbol)) {
+                return set;
+            }
         }
 
-        return first(rule.get(firstIndexOfSymbol + 1));
+        set.add("$");
+
+        return set;
     }
 
 }

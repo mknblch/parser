@@ -1,0 +1,20 @@
+;; Options
+#START ::= S
+#EPSILON ::= E
+
+;; Omit
+~DELIMITER ::= \s+|;
+
+;; Terminal Expressions
+%num ::= \d+
+%plus ::= \+
+%mul ::= \*
+%ob ::= \(
+%cb ::= \)
+
+;; Rules
+S ::= T K
+K ::= %plus T K | E
+T ::= F G
+G ::= %mul F G | E
+F ::= %ob S %cb | %num

@@ -1,16 +1,17 @@
-;; Omit following
-#DELIMITER ::= \s+|;
+;; Options
+#START ::= S
+#EPSILON ::= E
 
-;; Regular Expressions
+;; Omit
+~DELIMITER ::= \s+|;
+
+;; Terminal Expressions
 %a ::= a
 %b ::= b
 
 ;; Rules
+S ::= A B A
 A ::= %a | E
 B ::= %b
-
-
-;; Start
-!S ::= A B A
 
 

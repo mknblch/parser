@@ -14,7 +14,7 @@ public class FirstFollowCalcTest {
 
     @Before
     public void setUp() throws Exception {
-        firstFollowCalc = new FirstFollowCalc(GrammarReader.loadResource("bnf2.lng"));
+        firstFollowCalc = new FirstFollowCalc(GrammarReader.loadResource("bnf3.lng"));
     }
 
     @Test

@@ -1,6 +1,6 @@
 package de.mknblch.lfp.grammar;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,31 +8,36 @@ import java.util.List;
  */
 public class Rule {
 
-    private final List<String> symbols;
+    private final String left;
+    private final List<String> right;
 
-    public Rule(List<String> symbols) {
-        this.symbols = symbols;
-    }
-
-    public Rule(String[] symbols) {
-        this.symbols = Arrays.asList(symbols);
+    public Rule(String left, List<String> right) {
+        this.left = left;
+        this.right = right;
     }
 
     public boolean allEquals(String symbol) {
-        return symbols.stream().allMatch(symbol::equals);
+        return right.stream().allMatch(symbol::equals);
     }
 
-    public int indexOf(String symbol) {
-        return symbols.indexOf(symbol);
+    public List<Integer> find(String symbol) {
+
+        final ArrayList<Integer> list = new ArrayList<>();
+        for (int i = 0; i < right.size(); i++) {
+            if (symbol.equals(right.get(i))) {
+                list.add(i);
+            }
+        }
+        return list;
     }
 
     public String get(int index) {
-        return symbols.get(index);
+        return right.get(index);
     }
 
     public String join (String delimiter) {
         final StringBuilder builder = new StringBuilder();
-        for (String symbol : symbols) {
+        for (String symbol : right) {
             if (builder.length() != 0) {
                 builder.append(delimiter);
             }
@@ -42,11 +47,11 @@ public class Rule {
     }
 
     public int size() {
-        return symbols.size();
+        return right.size();
     }
 
     @Override
     public String toString() {
-        return join(" ");
+        return left + " ::= " + join(" ");
     }
 }
