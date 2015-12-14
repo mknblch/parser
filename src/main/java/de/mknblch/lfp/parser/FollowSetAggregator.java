@@ -14,7 +14,7 @@ public class FollowSetAggregator {
     private final Grammar grammar;
     private final Map<String, Set<String>> firstMap;
 
-    private final Map<String, List<String>> followSet = new HashMap<>();
+    private final Map<String, Set<String>> followSet = new HashMap<>();
 
     public FollowSetAggregator(Grammar grammar, Map<String, Set<String>> firstMap) {
         this.grammar = grammar;
@@ -33,9 +33,24 @@ public class FollowSetAggregator {
         return rule.allEquals(grammar.epsilonSymbol);
     }
 
+    private void balance() {
+        for (Map.Entry<String, Set<String>> entry : followSet.entrySet()) {
+
+           entry.getValue().stream()
+                   .filter(grammar::isNonTerminal)
+                   .peek(entry.getValue()::remove)
+                   .forEach(nt -> {
+                       try {
+                           firstMap.put(entry.getKey(), follow(nt));
+                       } catch (GrammarException e) {
+                           e.printStackTrace();
+                       }
+                   });
+        }
+    }
+
     public Map<String, Set<String>> follow() throws GrammarException {
 
-        final HashMap<String, Set<String>> followSet = new HashMap<>();
         for (final String find : grammar.ruleMap.keySet()) {
             // Start symbol
             if (grammar.startSymbol.equals(find)) {
@@ -43,9 +58,9 @@ public class FollowSetAggregator {
                 continue;
             }
             followSet.put(find, follow(find));
-
-
         }
+
+        balance();
         return followSet;
     }
 

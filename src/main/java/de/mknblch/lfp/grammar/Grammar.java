@@ -42,6 +42,10 @@ public class Grammar {
         return patternMap.containsKey(symbol);
     }
 
+    public boolean isNonTerminal(String symbol) {
+        return ruleMap.containsKey(symbol);
+    }
+
     public Set<String> terminals() {
         return patternMap.keySet();
     }
