@@ -9,6 +9,7 @@ import java.util.List;
 public class Rule {
 
     public final String left;
+
     private final List<String> right;
 
     public Rule(String left, List<String> right) {

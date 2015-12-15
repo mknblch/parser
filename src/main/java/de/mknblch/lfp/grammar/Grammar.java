@@ -42,6 +42,11 @@ public class Grammar {
         return patternMap.containsKey(symbol);
     }
 
+
+    public boolean isNonTerminal(String symbol) {
+        return ruleMap.containsKey(symbol);
+    }
+
     public Set<String> terminals() {
         return patternMap.keySet();
     }
@@ -57,6 +62,11 @@ public class Grammar {
                 .collect(Collectors.toSet());
     }
 
+    public List<Rule> rules() {
+        return ruleMap.values().stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+    }
     @Override
     public String toString() {
         final StringBuilder buffer = new StringBuilder();

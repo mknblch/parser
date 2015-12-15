@@ -31,7 +31,7 @@ public class AggregatorTest {
     }
 
     @Test
-    public void testFollow() throws Exception {
+    public void testFollow4() throws Exception {
         final Map<String, Set<String>> follow = getFollows("bnf4.lng");
         System.out.println("FOLLOW: " + follow);
         assertContains(follow, "A", "%b", "%c");
@@ -43,9 +43,21 @@ public class AggregatorTest {
 
     }
 
+    @Test
+    public void testFollow5() throws Exception {
+        final Map<String, Set<String>> follow = getFollows("bnf5.lng");
+        System.out.println("FOLLOW: " + follow);
+        assertContains(follow, "A", "%b");
+        assertContains(follow, "B", "%c", "$");
+        assertContains(follow, "C", "$");
+        assertContains(follow, "S", "$");
+
+    }
+
 
     private void assertContains(Map<String, Set<String>> result, String symbol, String... expected) {
         final Set<String> set = result.get(symbol);
+        assertNotNull(symbol + " not found", set);
         assertEquals("Length mismatch in " + symbol + "! Expected: " + String.join(",", expected) + " Got: " + set,
                 expected.length, set.size());
         for (String s : expected) {

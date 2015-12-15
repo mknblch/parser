@@ -1,0 +1,17 @@
+;; Options
+#START ::= S
+#EPSILON ::= EPS
+
+;; Omit
+~DELIMITER ::= \s+|;
+
+;; Terminal Expressions
+%a ::= a
+%b ::= b
+%c ::= c
+
+;; Rules
+S ::= A B C
+A ::= %a | EPS
+B ::= %b
+C ::= %c | EPS
