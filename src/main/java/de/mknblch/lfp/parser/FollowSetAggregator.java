@@ -73,9 +73,7 @@ public class FollowSetAggregator {
                 append.put(entry.getKey(), follows);
             }
 
-            for (Map.Entry<String, Set<String>> entry : append.entrySet()) {
-                followSet.replace(entry.getKey(), entry.getValue());
-            }
+
 
             append.entrySet().stream().forEach(e -> followSet.get(e.getKey()).addAll(e.getValue()));
 
