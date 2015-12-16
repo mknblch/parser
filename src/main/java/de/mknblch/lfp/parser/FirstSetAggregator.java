@@ -28,24 +28,19 @@ public class FirstSetAggregator {
     }
 
     public Set<String> first(String symbol) throws GrammarException {
-
         final Set<String> previous = firstSet.get(symbol);
         if (null != previous) {
             return previous;
         }
-
         final HashSet<String> firstSet = new HashSet<>();
-
         if (grammar.isTerminal(symbol)) {
             firstSet.add(symbol);
             return firstSet;
         }
-
         if (grammar.isEpsilon(symbol)) {
             firstSet.add(symbol);
             return firstSet;
         }
-
         final List<Rule> rules = grammar.getRuleMap().get(symbol);
         // iterate each rule
         for (Rule rule : rules) {
@@ -55,7 +50,6 @@ public class FirstSetAggregator {
     }
 
     private Set<String> first(Rule rule, int index) throws GrammarException {
-
         final Set<String> ret = new HashSet<>();
         if (rule.allEquals(grammar.getEpsilonSymbol())) {
             ret.add(grammar.getEpsilonSymbol());
@@ -69,20 +63,13 @@ public class FirstSetAggregator {
             ret.add(symbol);
             return ret;
         }
-
         final Set<String> first = first(symbol);
         first.stream()
                 .filter(s -> !grammar.isEpsilon(symbol))
                 .forEach(ret::add);
-
         if (first.contains(grammar.getEpsilonSymbol())) {
             ret.addAll(first(rule, index + 1));
         }
-
         return ret;
-    }
-
-    private boolean isEpsilonRule(Rule rule) {
-        return rule.allEquals(grammar.getEpsilonSymbol());
     }
 }
