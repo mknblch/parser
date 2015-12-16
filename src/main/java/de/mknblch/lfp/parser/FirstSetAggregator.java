@@ -19,8 +19,8 @@ public class FirstSetAggregator {
         this.grammar = grammar;
     }
 
-    public Map<String, Set<String>> getFirstSets() throws GrammarException {
-        for (String nonTerminal : grammar.ruleMap.keySet()) {
+    public Map<String, Set<String>> getFirstSet() throws GrammarException {
+        for (String nonTerminal : grammar.getRuleMap().keySet()) {
             firstSet.put(nonTerminal, first(nonTerminal));
         }
 
@@ -29,10 +29,10 @@ public class FirstSetAggregator {
 
     public Set<String> first(String symbol) throws GrammarException {
 
-//        final Set<String> previous = firstSet.get(symbol);
-//        if (null != previous) {
-//            return previous;
-//        }
+        final Set<String> previous = firstSet.get(symbol);
+        if (null != previous) {
+            return previous;
+        }
 
         final HashSet<String> firstSet = new HashSet<>();
 
@@ -46,30 +46,24 @@ public class FirstSetAggregator {
             return firstSet;
         }
 
-        final List<Rule> rules = grammar.ruleMap.get(symbol);
+        final List<Rule> rules = grammar.getRuleMap().get(symbol);
         // iterate each rule
         for (Rule rule : rules) {
-            firstSet.addAll(first(rule));
+            firstSet.addAll(first(rule, 0));
         }
         return firstSet;
-    }
-
-    private Set<String> first(Rule rule) throws GrammarException {
-        return first(rule, 0);
     }
 
     private Set<String> first(Rule rule, int index) throws GrammarException {
 
         final Set<String> ret = new HashSet<>();
-        if (isEpsilonRule(rule)) {
-            ret.add(grammar.epsilonSymbol);
+        if (rule.allEquals(grammar.getEpsilonSymbol())) {
+            ret.add(grammar.getEpsilonSymbol());
             return ret;
         }
-
         if (index >= rule.size()) {
             return ret;
         }
-
         final String symbol = rule.get(index);
         if (grammar.isTerminal(symbol)) {
             ret.add(symbol);
@@ -77,12 +71,11 @@ public class FirstSetAggregator {
         }
 
         final Set<String> first = first(symbol);
-
         first.stream()
                 .filter(s -> !grammar.isEpsilon(symbol))
                 .forEach(ret::add);
 
-        if (first.contains(grammar.epsilonSymbol)) {
+        if (first.contains(grammar.getEpsilonSymbol())) {
             ret.addAll(first(rule, index + 1));
         }
 
@@ -90,6 +83,6 @@ public class FirstSetAggregator {
     }
 
     private boolean isEpsilonRule(Rule rule) {
-        return rule.allEquals(grammar.epsilonSymbol);
+        return rule.allEquals(grammar.getEpsilonSymbol());
     }
 }

@@ -1,5 +1,6 @@
 package de.mknblch.lfp.parser;
 
+import de.mknblch.lfp.common.Table;
 import org.junit.Before;
 import org.junit.Test;
 

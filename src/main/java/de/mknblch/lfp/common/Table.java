@@ -1,4 +1,4 @@
-package de.mknblch.lfp.parser;
+package de.mknblch.lfp.common;
 
 import java.util.HashMap;
 import java.util.Map;

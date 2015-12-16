@@ -9,11 +9,13 @@ import java.util.stream.Collectors;
  */
 public class Grammar {
 
-    public final String startSymbol;
-    public final String epsilonSymbol;
-    public final Map<String, Pattern> exclusionMap;
-    public final Map<String, Pattern> patternMap;
-    public final Map<String, List<Rule>> ruleMap;
+    public static final String END_SYMBOL = "$";
+
+    private final String startSymbol;
+    private final String epsilonSymbol;
+    private final Map<String, Pattern> exclusionMap;
+    private final Map<String, Pattern> patternMap;
+    private final Map<String, List<Rule>> ruleMap;
 
     public Grammar(String startSymbol,
                    String epsilonSymbol, Map<String, Pattern> exclusionMap, Map<String, Pattern> patternMap,
@@ -70,6 +72,27 @@ public class Grammar {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
+
+    public String getStartSymbol() {
+        return startSymbol;
+    }
+
+    public String getEpsilonSymbol() {
+        return epsilonSymbol;
+    }
+
+    public Map<String, Pattern> getExclusionMap() {
+        return exclusionMap;
+    }
+
+    public Map<String, Pattern> getPatternMap() {
+        return patternMap;
+    }
+
+    public Map<String, List<Rule>> getRuleMap() {
+        return ruleMap;
+    }
+
     @Override
     public String toString() {
         final StringBuilder buffer = new StringBuilder();

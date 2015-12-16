@@ -29,7 +29,7 @@ public class Lexer {
             final String rest = input.substring(i);
 
             // cut out expressions to exclude
-            for (Map.Entry<String, Pattern> entry : grammar.exclusionMap.entrySet()) {
+            for (Map.Entry<String, Pattern> entry : grammar.getExclusionMap().entrySet()) {
                 final Matcher matcher = match(rest, entry.getValue());
                 if (null == matcher) {
                     continue;
@@ -38,7 +38,7 @@ public class Lexer {
                 continue outer;
             }
             // match tokens
-            for (Map.Entry<String, Pattern> entry : grammar.patternMap.entrySet()) {
+            for (Map.Entry<String, Pattern> entry : grammar.getPatternMap().entrySet()) {
                 final Matcher matcher = match(rest, entry.getValue());
                 if (null == matcher) {
                     continue;

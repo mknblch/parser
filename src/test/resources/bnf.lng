@@ -1,5 +1,7 @@
+#EPSILON ::= EPSILON
+#START ::= S
 ;; Omit following
-#DELIMITER ::= \s+|;
+~DELIMITER ::= \s+|;
 
 ;; Regular Expressions
 %VARIABLE ::= \$\w+\d*
@@ -13,7 +15,7 @@
 VALUE ::= %STRING | %NUM | %VARIABLE
 
 ;; Start
-!S ::= %ID %OPEN VALUE %CLOSE
+S ::= %ID %OPEN VALUE %CLOSE
 
 
 

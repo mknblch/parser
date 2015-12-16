@@ -1,9 +1,9 @@
-package de.mknblch.lfp.parser;
-
-import com.sun.org.apache.bcel.internal.generic.RET;
+package de.mknblch.lfp.common;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Created by mknblch on 15.12.2015.
@@ -16,48 +16,30 @@ public class Bag<K, T> {
         return bag.entrySet();
     }
 
-    public Set<T> get(K key) {
-        return bag.get(key);
+    public List<T> values() {
+        return bag.values().stream().flatMap(Set::stream).collect(Collectors.toList());
     }
 
     public Map<K, Set<T>> getMap() {
         return bag;
     }
 
-    public void put(K key, T... elements) {
-        Set<T> set = get(key);
-        if (null == set) {
-            set = new HashSet<>();
-            bag.put(key, set);
-        }
-        Collections.addAll(set, elements);
+    public Set<T> get(K key) {
+        return bag.get(key);
     }
 
-    public void put(K key, Collection<T> elements) {
-        Set<T> set = get(key);
-        if (null == set) {
-            set = new HashSet<>();
-            bag.put(key, set);
-        }
-        set.addAll(elements);
+    public Bag<K, T> put(K key, T element) {
+        getOrCreate(key).add(element);
+        return this;
     }
 
-    public boolean replace(K key, T needle, T replacement) {
-        final Set<T> set = get(key);
-        if (null != set && set.remove(needle)) {
-            set.add(replacement);
-            return true;
-        }
-        return false;
+    public Bag<K, T> putAll(K key, Collection<T> elements) {
+        getOrCreate(key).addAll(elements);
+        return this;
     }
 
-    public boolean replace(K key, T needle, Collection<T> replacement) {
-        final Set<T> set = get(key);
-        if (null != set && set.remove(needle)) {
-            set.addAll(replacement);
-            return true;
-        }
-        return false;
+    public void clear() {
+        bag.clear();
     }
 
     public boolean replaceIf(Predicate<T> predicate, Set<T> replacement) {
@@ -75,6 +57,11 @@ public class Bag<K, T> {
         return changed;
     }
 
+    public Bag<K, T> forEachValue(Consumer<T> consumer) {
+        values().forEach(consumer);
+        return this;
+    }
+
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
@@ -87,5 +74,14 @@ public class Bag<K, T> {
             builder.append("} ");
         }
         return builder.toString();
+    }
+
+    private Set<T> getOrCreate(K key) {
+        Set<T> set = get(key);
+        if (null == set) {
+            set = new HashSet<>();
+            bag.put(key, set);
+        }
+        return set;
     }
 }
