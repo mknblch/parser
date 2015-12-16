@@ -12,22 +12,10 @@ import java.util.Set;
 public class ParseTableCalc {
 
     private final Grammar grammar;
-    private final Map<String, Set<String>> firstSet;
-    private final Map<String, Set<String>> followSet;
 
     public ParseTableCalc(Grammar grammar) throws GrammarException {
         this.grammar = grammar;
 
-        final FirstFollowCalc calc = new FirstFollowCalc(grammar);
-        firstSet = calc.first();
-        followSet = calc.follow();
-    }
 
-//    public ParseTable build() {
-//
-//        for (String nonTerminal : grammar.nonTerminals()) {
-//
-//
-//        }
-//    }
+    }
 }

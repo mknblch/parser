@@ -5,6 +5,7 @@ import de.mknblch.lfp.grammar.GrammarException;
 import de.mknblch.lfp.grammar.Rule;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -26,18 +27,11 @@ public class FollowSetAggregator {
     }
 
     private void add(String nonTerminal, String... symbols) {
-        final HashSet<String> set = new HashSet<>();
-        Collections.addAll(set, symbols);
-        add(nonTerminal, set);
+        followSet.put(nonTerminal, symbols);
     }
 
     private void add(String nonTerminal, Set<String> symbols) {
-        Set<String> follows = followSet.get(nonTerminal);
-        if (null == follows) {
-            follows = new HashSet<>();
-            followSet.put(nonTerminal, follows);
-        }
-        follows.addAll(symbols);
+        followSet.put(nonTerminal, symbols);
     }
 
     public Bag<String, String> follow() throws GrammarException {
@@ -45,8 +39,8 @@ public class FollowSetAggregator {
     }
 
     private void build() {
-        grammar.rules().forEach(this::followRule);
-        reduce();
+        grammar.rules().forEach(this::follow);
+        while(reduce());
     }
 
     private Set<String> reduce(String left, String nonTerminal) {
@@ -58,65 +52,24 @@ public class FollowSetAggregator {
         return ret;
     }
 
-    private void reduce() {
-
-        final HashMap<String, Set<String>> append = new HashMap<>();
-        do {
-            append.clear();
-            for (Map.Entry<String, Set<String>> entry : followSet.entrySet()) {
-                final Set<String> follows = entry.getValue().stream()
-                        .filter(grammar::isNonTerminal)
-                        .map(s -> reduce(entry.getKey(), s)) // error
-                        .flatMap(Collection::stream)
-                        .collect(Collectors.toSet());
-
-                append.put(entry.getKey(), follows);
-            }
-
-
-
-            append.entrySet().stream().forEach(e -> followSet.get(e.getKey()).addAll(e.getValue()));
-
-        } while (!append.isEmpty());
-
-    }
-
-    private void followRule(Rule rule) {
-        for (int index = 0; index < rule.size(); index++) {
-            final String symbol = rule.get(index);
-            if (!grammar.isNonTerminal(symbol)) {
-                continue;
-            }
-            if (index + 1 >= rule.size()) {
-                add(symbol, rule.left);
-            } else {
-                add(symbol, rule.get(index+1));
-            }
+    private void replace(Set<String> haystack, String needle, Set<String> replacement) {
+        if (haystack.remove(needle)) {
+            haystack.addAll(replacement);
         }
     }
 
-    private Set<String> follow(Rule rule, int index) throws GrammarException {
+    private boolean reduce() {
 
-        final HashSet<String> set = new HashSet<>();
-
-        for (int i = index + 1; i < rule.size(); i++) {
-
-            final String symbol = rule.get(index);
-
-            final Set<String> first = first(symbol);
-
-            set.addAll(first);
-            set.remove(grammar.epsilonSymbol);
-
-            if (!first.contains(grammar.epsilonSymbol)) {
-                return set;
-            }
+        boolean changed = false;
+        for (Map.Entry<String, Set<String>> entry : followSet.entrySet()) {
+            final String nonTerminal = entry.getKey();
+            final Set<String> follows = entry.getValue();
+            changed |= followSet.replaceIf(nonTerminal::equals, follows);
         }
 
-        set.add(rule.left);
-
-        return set;
+        return changed;
     }
+
 
     private Set<String> toSet(String symbol) {
         return new HashSet<String>() {{
@@ -124,12 +77,37 @@ public class FollowSetAggregator {
         }};
     }
 
-
     private Set<String> first(String symbol) {
         if (grammar.isTerminal(symbol)) {
             return toSet(symbol);
         }
         return firstMap.get(symbol);
+    }
+
+    private void follow(Rule rule) {
+
+        final Set<String> nonTerminals = grammar.nonTerminals();
+
+        for (String nonTerminal : nonTerminals) {
+
+            rule.find(nonTerminal)
+                    .forEach(index -> follow(nonTerminal, rule, index));
+        }
+
+    }
+
+    private void follow(String nonTerminal, Rule rule, int index) {
+        for (int i = index + 1; i < rule.size(); i++) {
+            final String symbol = rule.get(i);
+            final Set<String> first = first(symbol);
+            if (!first.contains(grammar.epsilonSymbol)) {
+                add(nonTerminal, first);
+                return;
+            }
+            first.remove(grammar.epsilonSymbol);
+            add(nonTerminal, first);
+        }
+        add(nonTerminal, rule.left);
     }
 
 }

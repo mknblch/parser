@@ -2,6 +2,10 @@ package de.mknblch.lfp.grammar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 /**
  * @author martinknobloch

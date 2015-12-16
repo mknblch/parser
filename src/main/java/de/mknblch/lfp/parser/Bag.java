@@ -1,6 +1,7 @@
 package de.mknblch.lfp.parser;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Created by mknblch on 15.12.2015.
@@ -17,11 +18,9 @@ public class Bag<K, T> {
         return bag.get(key);
     }
 
-    public Map<K, Set<T>> getBag() {
+    public Map<K, Set<T>> getMap() {
         return bag;
     }
-
-    
 
     public void put(K key, T... elements) {
         Set<T> set = get(key);
@@ -55,6 +54,19 @@ public class Bag<K, T> {
         if (null != set && set.remove(needle)) {
             set.addAll(replacement);
             return true;
+        }
+        return false;
+    }
+
+    public boolean replaceIf(Predicate<T> predicate, Set<T> replacement) {
+        for (Set<T> ts : bag.values()) {
+            for (Iterator<T> it = ts.iterator(); it.hasNext(); ) {
+                if (predicate.test(it.next())) {
+                    it.remove();
+                    ts.addAll(replacement);
+                    return true;
+                }
+            }
         }
         return false;
     }

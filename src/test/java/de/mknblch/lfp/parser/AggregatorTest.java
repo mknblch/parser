@@ -72,6 +72,6 @@ public class AggregatorTest {
     private Map<String, Set<String>> getFollows(String file) throws GrammarException {
         final Grammar grammar = GrammarReader.loadResource(file);
         final FirstSetAggregator firstSetAggregator = new FirstSetAggregator(grammar);
-        return new FollowSetAggregator(grammar, firstSetAggregator.getFirstSets()).follow().getBag();
+        return new FollowSetAggregator(grammar, firstSetAggregator.getFirstSets()).follow().getMap();
     }
 }
