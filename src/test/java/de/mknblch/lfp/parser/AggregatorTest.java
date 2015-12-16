@@ -67,6 +67,13 @@ public class AggregatorTest {
     }
 
 
+    @Test
+    public void testBnf3() throws Exception {
+
+        final Map<String, Set<String>> follow = getFollows("bnf3.lng");
+        System.out.println("FOLLOW: " + follow);
+    }
+
     private void assertContains(Map<String, Set<String>> result, String symbol, String... expected) {
         final Set<String> set = result.get(symbol);
         assertNotNull(symbol + " not found", set);

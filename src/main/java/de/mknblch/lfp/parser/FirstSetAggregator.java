@@ -29,10 +29,10 @@ public class FirstSetAggregator {
 
     public Set<String> first(String symbol) throws GrammarException {
 
-        final Set<String> previous = firstSet.get(symbol);
-        if (null != previous) {
-            return previous;
-        }
+//        final Set<String> previous = firstSet.get(symbol);
+//        if (null != previous) {
+//            return previous;
+//        }
 
         final HashSet<String> firstSet = new HashSet<>();
 

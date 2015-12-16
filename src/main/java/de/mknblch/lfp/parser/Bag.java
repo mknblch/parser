@@ -1,5 +1,7 @@
 package de.mknblch.lfp.parser;
 
+import com.sun.org.apache.bcel.internal.generic.RET;
+
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -59,15 +61,31 @@ public class Bag<K, T> {
     }
 
     public boolean replaceIf(Predicate<T> predicate, Set<T> replacement) {
+        boolean changed = false;
         for (Set<T> ts : bag.values()) {
             for (Iterator<T> it = ts.iterator(); it.hasNext(); ) {
                 if (predicate.test(it.next())) {
                     it.remove();
                     ts.addAll(replacement);
-                    return true;
+                    changed = true;
+                    break;
                 }
             }
         }
-        return false;
+        return changed;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+
+        for (K k : bag.keySet()) {
+            builder.append(k).append("->{ ");
+            for (T t : bag.get(k)) {
+                builder.append(t).append(" ");
+            }
+            builder.append("} ");
+        }
+        return builder.toString();
     }
 }
