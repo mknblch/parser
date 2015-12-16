@@ -61,6 +61,10 @@ public class Grammar {
                 .collect(Collectors.toSet());
     }
 
+    public boolean isSymbol(String symbol) {
+        return isTerminal(symbol) || isNonTerminal(symbol);
+    }
+
     public List<Rule> rules() {
         return ruleMap.values().stream()
                 .flatMap(Collection::stream)

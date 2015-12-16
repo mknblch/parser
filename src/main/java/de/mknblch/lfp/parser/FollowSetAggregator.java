@@ -7,6 +7,7 @@ import de.mknblch.lfp.grammar.Rule;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by mknblch on 13.12.2015.
@@ -24,6 +25,10 @@ public class FollowSetAggregator {
 
         add(grammar.startSymbol, "$");
         build();
+    }
+
+    private void add(String nonTerminal, Stream<String> symbolStream) {
+        symbolStream.forEach(symbol -> followSet.put(nonTerminal, symbol));
     }
 
     private void add(String nonTerminal, String... symbols) {
@@ -56,6 +61,32 @@ public class FollowSetAggregator {
     }
 
 
+    private void follow(Rule rule) {
+
+        final Set<String> nonTerminals = grammar.nonTerminals();
+
+        for (String nonTerminal : nonTerminals) {
+
+            for (int index : rule.find(nonTerminal)) {
+
+                follow(nonTerminal, rule, index);
+            }
+        }
+    }
+
+    private void follow(String nonTerminal, Rule rule, int index) {
+        for (int i = index + 1; i < rule.size(); i++) {
+            final String symbol = rule.get(i);
+            final Set<String> first = first(symbol);
+            if (!first.contains(grammar.epsilonSymbol)) {
+                add(nonTerminal, first);
+                return;
+            }
+            add(nonTerminal, first.stream().filter(grammar::isSymbol));
+        }
+        add(nonTerminal, rule.left);
+    }
+
     private Set<String> toSet(String symbol) {
         return new HashSet<String>() {{
             add(symbol);
@@ -67,32 +98,6 @@ public class FollowSetAggregator {
             return toSet(symbol);
         }
         return firstMap.get(symbol);
-    }
-
-    private void follow(Rule rule) {
-
-        final Set<String> nonTerminals = grammar.nonTerminals();
-
-        for (String nonTerminal : nonTerminals) {
-
-            rule.find(nonTerminal)
-                    .forEach(index -> follow(nonTerminal, rule, index));
-        }
-
-    }
-
-    private void follow(String nonTerminal, Rule rule, int index) {
-        for (int i = index + 1; i < rule.size(); i++) {
-            final String symbol = rule.get(i);
-            final Set<String> first = first(symbol);
-            if (!first.contains(grammar.epsilonSymbol)) {
-                add(nonTerminal, first);
-                return;
-            }
-            first.remove(grammar.epsilonSymbol);
-            add(nonTerminal, first);
-        }
-        add(nonTerminal, rule.left);
     }
 
 }

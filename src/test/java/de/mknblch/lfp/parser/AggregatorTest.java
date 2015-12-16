@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 public class AggregatorTest {
 
     @Test
-    public void testFirst() throws Exception {
+    public void testFirst4() throws Exception {
 
         final Map<String, Set<String>> first = getFirsts("bnf4.lng");
         System.out.println("FIRST: " + first);
@@ -28,6 +28,18 @@ public class AggregatorTest {
         assertContains(first, "D", "%d", "EPS");
         assertContains(first, "E", "%e", "EPS");
         assertContains(first, "S", "%a", "%b", "%c", "EPS");
+    }
+
+    @Test
+    public void testFirst5() throws Exception {
+
+        final Map<String, Set<String>> first = getFirsts("bnf5.lng");
+        System.out.println("FIRST: " + first);
+
+        assertContains(first, "A", "%a", "EPS");
+        assertContains(first, "B", "%b");
+        assertContains(first, "C", "%c", "EPS");
+        assertContains(first, "S", "%a", "%b", "EPS");
     }
 
     @Test
