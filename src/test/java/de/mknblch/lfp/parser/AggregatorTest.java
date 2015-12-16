@@ -34,11 +34,11 @@ public class AggregatorTest {
     public void testFollow4() throws Exception {
         final Map<String, Set<String>> follow = getFollows("bnf4.lng");
         System.out.println("FOLLOW: " + follow);
+        assertContains(follow, "S", "$");
         assertContains(follow, "A", "%b", "%c");
         assertContains(follow, "B", "%c");
         assertContains(follow, "C", "%d", "%e", "$");
         assertContains(follow, "D", "%e", "$");
-        assertContains(follow, "S", "$");
         assertContains(follow, "E", "$");
 
     }
@@ -72,6 +72,7 @@ public class AggregatorTest {
     private Map<String, Set<String>> getFollows(String file) throws GrammarException {
         final Grammar grammar = GrammarReader.loadResource(file);
         final FirstSetAggregator firstSetAggregator = new FirstSetAggregator(grammar);
-        return new FollowSetAggregator(grammar, firstSetAggregator.getFirstSets()).follow().getMap();
+        final Map<String, Set<String>> firstSets = firstSetAggregator.getFirstSets();
+        return new FollowSetAggregator(grammar, firstSets).follow().getMap();
     }
 }

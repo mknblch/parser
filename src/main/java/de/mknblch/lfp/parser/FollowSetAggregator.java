@@ -43,21 +43,6 @@ public class FollowSetAggregator {
         while(reduce());
     }
 
-    private Set<String> reduce(String left, String nonTerminal) {
-        final Set<String> ret = first(nonTerminal);
-        if (ret.contains(grammar.epsilonSymbol)) {
-            ret.remove(grammar.epsilonSymbol);
-            ret.addAll(followSet.get(left));
-        }
-        return ret;
-    }
-
-    private void replace(Set<String> haystack, String needle, Set<String> replacement) {
-        if (haystack.remove(needle)) {
-            haystack.addAll(replacement);
-        }
-    }
-
     private boolean reduce() {
 
         boolean changed = false;
