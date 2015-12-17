@@ -1,5 +1,6 @@
 package de.mknblch.lfp.parser;
 
+import de.mknblch.lfp.common.Bag;
 import de.mknblch.lfp.grammar.Grammar;
 import de.mknblch.lfp.grammar.GrammarException;
 import de.mknblch.lfp.grammar.Rule;
@@ -13,7 +14,7 @@ public class FirstSetAggregator {
 
     private final Grammar grammar;
 
-    private final Map<String, Set<String>> firstSet = new HashMap<>();
+    private final Bag<String, String> firstSet = new Bag<>();
 
     public FirstSetAggregator(Grammar grammar) {
         this.grammar = grammar;
@@ -21,16 +22,15 @@ public class FirstSetAggregator {
 
     public Map<String, Set<String>> getFirstSet() throws GrammarException {
         for (String nonTerminal : grammar.getRuleMap().keySet()) {
-            firstSet.put(nonTerminal, first(nonTerminal));
+            firstSet.putAll(nonTerminal, first(nonTerminal));
         }
-
-        return firstSet;
+        return firstSet.getMap();
     }
 
     public Set<String> first(String symbol) throws GrammarException {
-        final Set<String> previous = firstSet.get(symbol);
-        if (null != previous) {
-            return previous;
+        final Set<String> cached = firstSet.get(symbol);
+        if (null != cached) {
+            return cached;
         }
         final HashSet<String> firstSet = new HashSet<>();
         if (grammar.isTerminal(symbol)) {
