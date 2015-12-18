@@ -5,7 +5,6 @@ import de.mknblch.lfp.grammar.Grammar;
 import de.mknblch.lfp.grammar.Rule;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * Created by mknblch on 13.12.2015.
@@ -14,7 +13,7 @@ public class FollowSetAggregator {
 
     private final Grammar grammar;
     private final Map<String, Set<String>> firstMap;
-    private final Bag<String, String> followSet = new Bag<>();
+    private final Bag<String, String> cache = new Bag<>();
 
     public FollowSetAggregator(Grammar grammar, Map<String, Set<String>> firstMap) {
         this.grammar = grammar;
@@ -22,23 +21,15 @@ public class FollowSetAggregator {
     }
 
     public FollowSetAggregator build() {
-        followSet.clear();
-        add(grammar.getStartSymbol(), Grammar.END_SYMBOL);
+        cache.clear();
+        cache.put(grammar.getStartSymbol(), Grammar.END_SYMBOL);
         follow();
         reduce();
         return this;
     }
 
     public Map<String, Set<String>> getFollowMap() {
-        return followSet.getMap();
-    }
-
-    private void add(String nonTerminal, Stream<String> symbolStream) {
-        symbolStream.forEach(symbol -> followSet.put(nonTerminal, symbol));
-    }
-
-    private void add(String nonTerminal, String symbols) {
-        followSet.put(nonTerminal, symbols);
+        return cache.getMap();
     }
 
     /**
@@ -49,12 +40,12 @@ public class FollowSetAggregator {
         boolean changed;
         do {
             changed = false;
-            for (Map.Entry<String, Set<String>> entry : followSet.entrySet()) {
+            for (Map.Entry<String, Set<String>> entry : cache.entrySet()) {
                 final String nonTerminal = entry.getKey();
                 final Set<String> follows = entry.getValue();
-                changed |= followSet.replaceIf(nonTerminal::equals, follows);
+                changed |= cache.replaceIf(nonTerminal::equals, follows);
             }
-        }while(changed);
+        } while(changed);
     }
 
     /**
@@ -80,23 +71,16 @@ public class FollowSetAggregator {
      */
     private void followFrom(Rule rule, String nonTerminal, int index) {
         for (int i = index + 1; i < rule.size(); i++) { // iterate starting at next symbol after index
-            final Set<String> first = firstOf(rule.get(i));
-            add(nonTerminal, first.stream().filter(grammar::isSymbol));  // add all but epsilon
+            final Set<String> first = firstMap.get(rule.get(i));
+            first.stream()
+                    .filter(grammar::isSymbol)
+                    .forEach(symbol -> cache.put(nonTerminal, symbol));
+
             if (!first.contains(grammar.getEpsilonSymbol())) {
                 return; // no further search needed
             }
         }
         // nonTerminal at end of rule or epsilon-derivable until end -> add left-hand side symbol
-        add(nonTerminal, rule.left);
+        cache.put(nonTerminal, rule.left);
     }
-
-    private Set<String> firstOf(String symbol) {
-        if (grammar.isTerminal(symbol)) {
-            return new HashSet<String>() {{
-                add(symbol);
-            }};
-        }
-        return firstMap.get(symbol);
-    }
-
 }

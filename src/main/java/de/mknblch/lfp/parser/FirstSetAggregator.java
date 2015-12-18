@@ -6,6 +6,7 @@ import de.mknblch.lfp.grammar.GrammarException;
 import de.mknblch.lfp.grammar.Rule;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by mknblch on 13.12.2015.
@@ -14,61 +15,56 @@ public class FirstSetAggregator {
 
     private final Grammar grammar;
 
-    private final Bag<String, String> firstSet = new Bag<>();
+    private final Bag<String, String> cache = new Bag<>();
 
     public FirstSetAggregator(Grammar grammar) {
         this.grammar = grammar;
     }
 
-    public Map<String, Set<String>> getFirstSet() throws GrammarException {
-        for (String nonTerminal : grammar.getRuleMap().keySet()) {
-            firstSet.putAll(nonTerminal, first(nonTerminal));
-        }
-        return firstSet.getMap();
+    public Map<String, Set<String>> getFirstSet() {
+        return cache.getMap();
     }
 
-    public Set<String> first(String symbol) throws GrammarException {
-        final Set<String> cached = firstSet.get(symbol);
+    public FirstSetAggregator build() throws GrammarException {
+
+        grammar.terminals()
+                .forEach(s -> cache.put(s, s));
+
+        grammar.getRuleMap()
+                .values()
+                .stream()
+                .flatMap(List::stream)
+                .forEach(rule -> cache.putAll(rule.left, first(rule)));
+
+        return this;
+    }
+
+    private Set<String> first(String symbol) {
+        final Set<String> cached = cache.get(symbol);
         if (null != cached) {
             return cached;
         }
-        final HashSet<String> firstSet = new HashSet<>();
-        if (grammar.isTerminal(symbol)) {
-            firstSet.add(symbol);
-            return firstSet;
+
+        if (grammar.isNonTerminal(symbol)) {
+            return grammar.getRuleMap()
+                    .get(symbol)
+                    .stream()
+                    .map(this::first)
+                    .flatMap(Set::stream)
+                    .collect(Collectors.toSet());
         }
-        if (grammar.isEpsilon(symbol)) {
-            firstSet.add(symbol);
-            return firstSet;
-        }
-        final List<Rule> rules = grammar.getRuleMap().get(symbol);
-        // iterate each rule
-        for (Rule rule : rules) {
-            firstSet.addAll(first(rule, 0));
-        }
-        return firstSet;
+
+        return new HashSet<String>() {{add(symbol);}};
     }
 
-    private Set<String> first(Rule rule, int index) throws GrammarException {
+    private Set<String> first(Rule rule) {
         final Set<String> ret = new HashSet<>();
-        if (rule.allEquals(grammar.getEpsilonSymbol())) {
-            ret.add(grammar.getEpsilonSymbol());
-            return ret;
-        }
-        if (index >= rule.size()) {
-            return ret;
-        }
-        final String symbol = rule.get(index);
-        if (grammar.isTerminal(symbol)) {
-            ret.add(symbol);
-            return ret;
-        }
-        final Set<String> first = first(symbol);
-        first.stream()
-                .filter(s -> !grammar.isEpsilon(symbol))
-                .forEach(ret::add);
-        if (first.contains(grammar.getEpsilonSymbol())) {
-            ret.addAll(first(rule, index + 1));
+        for (int index = 0; index < rule.size(); index++) {
+            final Set<String> first = first(rule.get(index));
+            ret.addAll(first);
+            if (!first.contains(grammar.getEpsilonSymbol())) {
+                return ret;
+            }
         }
         return ret;
     }

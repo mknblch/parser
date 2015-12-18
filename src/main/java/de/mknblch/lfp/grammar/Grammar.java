@@ -64,7 +64,7 @@ public class Grammar {
     }
 
     public boolean isSymbol(String symbol) {
-        return isTerminal(symbol) || isNonTerminal(symbol);
+        return END_SYMBOL.equals(symbol) || isTerminal(symbol) || isNonTerminal(symbol);
     }
 
     public List<Rule> rules() {

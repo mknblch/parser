@@ -115,7 +115,7 @@ public class AggregatorTest {
     }
 
     private Map<String, Set<String>> getFirsts(Grammar grammar) throws GrammarException {
-        return new FirstSetAggregator(grammar).getFirstSet();
+        return new FirstSetAggregator(grammar).build().getFirstSet();
     }
 
     private Map<String, Set<String>> getFollows(Grammar grammar) throws GrammarException {
