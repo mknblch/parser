@@ -1,5 +1,7 @@
 package de.mknblch.lfp.grammar;
 
+import de.mknblch.lfp.common.DumpHelper;
+
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -38,6 +40,10 @@ public class Grammar {
 
     public boolean isEpsilon(String symbol) {
         return epsilonSymbol.equals(symbol);
+    }
+
+    public boolean isEpsilon(Rule rule) {
+        return rule.size() == 1 && epsilonSymbol.equals(rule.get(0));
     }
 
     public boolean isTerminal(String symbol) {
@@ -95,51 +101,6 @@ public class Grammar {
 
     @Override
     public String toString() {
-        final StringBuilder buffer = new StringBuilder();
-
-        buffer.append("OPTIONS:").append("\n");
-
-        buffer.append("\tSTART -> ").append(startSymbol).append("\n");
-        buffer.append("\tEPSILON -> ").append(epsilonSymbol).append("\n");
-
-        buffer.append("EXCLUDES:\n");
-        for (String symbol : exclusionMap.keySet()) {
-            buffer.append("\t")
-                    .append(symbol)
-                    .append(" -> ")
-                    .append(exclusionMap.get(symbol))
-                    .append("\n");
-        }
-        buffer.append("TERMINALS:\n");
-        for (String terminal : patternMap.keySet()) {
-            buffer.append("\t")
-                    .append(terminal)
-                    .append(" -> ")
-                    .append(patternMap.get(terminal))
-                    .append("\n");
-        }
-        buffer.append("RULES:\n");
-        for (String nonTerminal : ruleMap.keySet()) {
-            buffer.append("\t")
-                    .append(nonTerminal)
-                    .append(" -> ")
-                    .append(getRuleDump(nonTerminal))
-                    .append("\n");
-        }
-
-        return buffer.toString();
-    }
-
-    private String getRuleDump(String nonTerminal) {
-        final List<Rule> rules = ruleMap.get(nonTerminal);
-        final StringBuilder buffer = new StringBuilder();
-
-        for (Rule rule : rules) {
-            if (buffer.length() != 0) {
-                buffer.append(" | ");
-            }
-            buffer.append(rule);
-        }
-        return buffer.toString();
+        return DumpHelper.getGrammarDump(this);
     }
 }

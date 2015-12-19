@@ -12,20 +12,24 @@ import java.util.*;
 public class FollowSetAggregator {
 
     private final Grammar grammar;
-    private final Map<String, Set<String>> firstMap;
+    private final FirstSetAggregator firstAggregator;
     private final Bag<String, String> cache = new Bag<>();
 
-    public FollowSetAggregator(Grammar grammar, Map<String, Set<String>> firstMap) {
+    public FollowSetAggregator(Grammar grammar, FirstSetAggregator firstAggregator) {
         this.grammar = grammar;
-        this.firstMap = firstMap;
+        this.firstAggregator = firstAggregator;
     }
 
-    public FollowSetAggregator build() {
+    public FollowSetAggregator aggregate() {
         cache.clear();
         cache.put(grammar.getStartSymbol(), Grammar.END_SYMBOL);
         follow();
         reduce();
         return this;
+    }
+
+    public Set<String> get(String symbol) {
+        return cache.get(symbol);
     }
 
     public Map<String, Set<String>> getFollowMap() {
@@ -37,6 +41,7 @@ public class FollowSetAggregator {
      * its own follows until no set changes anymore.
      */
     private void reduce() {
+
         boolean changed;
         do {
             changed = false;
@@ -71,7 +76,7 @@ public class FollowSetAggregator {
      */
     private void followFrom(Rule rule, String nonTerminal, int index) {
         for (int i = index + 1; i < rule.size(); i++) { // iterate starting at next symbol after index
-            final Set<String> first = firstMap.get(rule.get(i));
+            final Set<String> first = firstAggregator.first(rule.get(i));
             first.stream()
                     .filter(grammar::isSymbol)
                     .forEach(symbol -> cache.put(nonTerminal, symbol));

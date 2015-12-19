@@ -57,6 +57,6 @@ public class Rule {
 
     @Override
     public String toString() {
-        return left + " ::= " + join(" ");
+        return left + " -> " + join(" ");
     }
 }

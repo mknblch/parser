@@ -51,10 +51,10 @@ public class AggregatorTest {
 
         final Map<String, Set<String>> first = getFirsts(bnf5);
         LOGGER.info("FIRST: {}", first);
-        assertContains(first, "A", "%a", "EPS");
+        assertContains(first, "A", "%a", "E");
         assertContains(first, "B", "%b");
-        assertContains(first, "C", "%c", "EPS");
-        assertContains(first, "S", "%a", "%b", "EPS");
+        assertContains(first, "C", "%c", "E");
+        assertContains(first, "S", "%a", "%b", "E");
     }
 
     @Test
@@ -125,12 +125,12 @@ public class AggregatorTest {
     }
 
     private Map<String, Set<String>> getFirsts(Grammar grammar) throws GrammarException {
-        return new FirstSetAggregator(grammar).build().getFirstSet();
+        return new FirstSetAggregator(grammar).aggregate().getFirstSet();
     }
 
     private Map<String, Set<String>> getFollows(Grammar grammar) throws GrammarException {
-        return new FollowSetAggregator(grammar, getFirsts(grammar))
-                .build()
+        return new FollowSetAggregator(grammar, new FirstSetAggregator(grammar).aggregate())
+                .aggregate()
                 .getFollowMap();
     }
 }

@@ -25,7 +25,11 @@ public class FirstSetAggregator {
         return cache.getMap();
     }
 
-    public FirstSetAggregator build() throws GrammarException {
+    public Set<String> get(String symbol) {
+        return cache.get(symbol);
+    }
+
+    public FirstSetAggregator aggregate() throws GrammarException {
 
         grammar.terminals()
                 .forEach(s -> cache.put(s, s));
@@ -39,7 +43,7 @@ public class FirstSetAggregator {
         return this;
     }
 
-    private Set<String> first(String symbol) {
+    public Set<String> first(String symbol) {
         final Set<String> cached = cache.get(symbol);
         if (null != cached) {
             return cached;
@@ -57,7 +61,7 @@ public class FirstSetAggregator {
         return new HashSet<String>() {{add(symbol);}};
     }
 
-    private Set<String> first(Rule rule) {
+    public Set<String> first(Rule rule) {
         final Set<String> ret = new HashSet<>();
         for (int index = 0; index < rule.size(); index++) {
             final Set<String> first = first(rule.get(index));

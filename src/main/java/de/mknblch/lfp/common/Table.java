@@ -66,4 +66,25 @@ public class Table<R, C, V> {
                 .map(Key::getColumn)
                 .collect(Collectors.toSet());
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        for (R row : getRows()) {
+            for (C col : getColumns()) {
+                final V v = get(row, col);
+                if (null == v) {
+                    continue;
+                }
+                builder.append("T[")
+                        .append(row)
+                        .append(",")
+                        .append(col)
+                        .append("] : ")
+                        .append(v)
+                        .append("\n");
+            }
+        }
+        return builder.toString();
+    }
 }

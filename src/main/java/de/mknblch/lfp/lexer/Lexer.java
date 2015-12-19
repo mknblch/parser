@@ -1,7 +1,6 @@
 package de.mknblch.lfp.lexer;
 
 import de.mknblch.lfp.grammar.Grammar;
-import de.mknblch.lfp.grammar.GrammarException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,13 +19,13 @@ public class Lexer {
         this.grammar = grammar;
     }
 
-    public List<Token> tokenize(final String input) throws GrammarException {
+    public List<Token> tokenize(final CharSequence input) throws LexerException {
 
         final ArrayList<Token> tokens = new ArrayList<>();
 
         outer:
         for (int i = 0; i < input.length(); ) {
-            final String rest = input.substring(i);
+            final CharSequence rest = input.subSequence(i, input.length());
 
             // cut out expressions to exclude
             for (Map.Entry<String, Pattern> entry : grammar.getExclusionMap().entrySet()) {
@@ -48,13 +47,14 @@ public class Lexer {
                 continue outer;
             }
             // no possible rule found, throw exception
-            throw new GrammarException("Parse Error at " +
+            throw new LexerException("Parse Error at " +
                     i +
                     " : '" +
-                    rest.substring(0, Math.min(rest.length(), 20)) +
+                    rest.subSequence(0, Math.min(rest.length(), 20)) +
                     "'");
         }
 
+        tokens.add(new Token(Grammar.END_SYMBOL, Grammar.END_SYMBOL));
         return tokens;
     }
 
