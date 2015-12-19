@@ -49,7 +49,7 @@ public class FollowSetAggregator {
     }
 
     /**
-     * calculate unreduced follow set which includes terminals, END symbol and left-hand side non-terminals.
+     * precalculate unreduced follow set which includes terminals, END symbol and left-hand side non-terminals.
      */
     private void follow() {
         final Set<String> nonTerminals = grammar.nonTerminals();

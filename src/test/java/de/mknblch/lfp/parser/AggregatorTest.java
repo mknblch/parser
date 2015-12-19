@@ -21,7 +21,7 @@ public class AggregatorTest {
 
     private static final Logger LOGGER = getLogger(AggregatorTest.class);
 
-    private static Grammar bnf1, bnf2, bnf3, bnf4, bnf5;
+    private static Grammar bnf1, bnf2, bnf3, bnf4, bnf5, bnf6;
 
     @BeforeClass
     public static void init() throws GrammarException {
@@ -30,6 +30,7 @@ public class AggregatorTest {
         bnf3 = GrammarReader.loadResource("bnf3.lng");
         bnf4 = GrammarReader.loadResource("bnf4.lng");
         bnf5 = GrammarReader.loadResource("bnf5.lng");
+        bnf6 = GrammarReader.loadResource("bnf6.lng");
     }
 
     @Test
@@ -100,6 +101,15 @@ public class AggregatorTest {
     public void testBnf() throws Exception {
         final Map<String, Set<String>> first = getFirsts(bnf1);
         final Map<String, Set<String>> follow = getFollows(bnf1);
+        LOGGER.info("FIRST: {}", first);
+        LOGGER.info("FOLLOW: {}", follow);
+    }
+
+
+    @Test
+    public void testBnf6() throws Exception {
+        final Map<String, Set<String>> first = getFirsts(bnf6);
+        final Map<String, Set<String>> follow = getFollows(bnf6);
         LOGGER.info("FIRST: {}", first);
         LOGGER.info("FOLLOW: {}", follow);
     }
