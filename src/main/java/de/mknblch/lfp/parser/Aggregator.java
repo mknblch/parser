@@ -25,10 +25,15 @@ public class Aggregator {
     public Aggregator(Grammar grammar) {
         this.grammar = grammar;
         firstSet = new Bag<>();
-        grammar.terminals().forEach(t -> firstSet.put(t, t));
         firstRules = new Bag<>();
         followSet = new Bag<>();
         nullable = new HashSet<>();
+
+        // First(terminal) = terminal
+        grammar.terminals().forEach(t -> firstSet.put(t, t));
+
+        // Follow(S) = $
+        followSet.put(grammar.getStartSymbol(), Grammar.END_SYMBOL);
     }
 
     public Set<String> getNullable() {
@@ -41,6 +46,10 @@ public class Aggregator {
 
     public Bag<Rule, String> getFirstRules() {
         return firstRules;
+    }
+
+    public Bag<String, String> getFollowSet() {
+        return followSet;
     }
 
     private void addNullable(String symbol) {
@@ -59,6 +68,10 @@ public class Aggregator {
 
     private void addFollow(String symbol, String first) {
         changed |= followSet.put(symbol, first);
+    }
+
+    private void addFollow(String symbol, Collection<String> firsts) {
+        changed |= followSet.putAll(symbol, firsts);
     }
 
     /*
@@ -85,21 +98,39 @@ until none of nullable,first,follow changed in last iteration
 
     /*
     if k=0 or {Y(1),...,Y(k)} subset of nullable then
-     nullable = nullable union {X}
-      for i = 1 to k
-    if i=1 or {Y(1),...,Y(i-1)} subset of nullable then
-      first(X) = first(X) union first(Y(i))
-    for j = i+1 to k
-      if i=k or {Y(i+1),...Y(k)} subset of nullable then
-        follow(Y(i)) = follow(Y(i)) union follow(X)
-      if i+1=j or {Y(i+1),...,Y(j-1)} subset of nullable then
-        follow(Y(i)) = follow(Y(i)) union first(Y(j))
+        nullable = nullable union {X}
+    for i = 1 to k
+        if i=1 or {Y(1),...,Y(i-1)} subset of nullable then
+            first(X) = first(X) union first(Y(i))
+        for j = i+1 to k
+            if i=k or {Y(i+1),...Y(k)} subset of nullable then
+                follow(Y(i)) = follow(Y(i)) union follow(X)
+            if i+1=j or {Y(i+1),...,Y(j-1)} subset of nullable then
+                follow(Y(i)) = follow(Y(i)) union first(Y(j))
      */
     private void aggregate(Rule rule) {
 
         aggregateNullable(rule);
-
         aggregateFirst(rule);
+        aggregateFollow(rule);
+    }
+
+    private void aggregateFollow(Rule rule) {
+
+        final int k = rule.size();
+
+        for (int i = 0; i < k; i++) {
+            final String symbol = rule.get(i);
+            for (int j = i+1; j < k; j++) {
+                if (i == k-1 || nullable.containsAll(rule.right().subList(i+1, k))) {
+                    addFollow(symbol, followSet.get(rule.left));
+                }
+
+                if (i + 1 == j || nullable.containsAll(rule.right().subList(i+1, j-1))) {
+                    addFollow(symbol, firstSet.get(rule.get(j)));
+                }
+            }
+        }
     }
 
     private void aggregateFirst(Rule rule) {

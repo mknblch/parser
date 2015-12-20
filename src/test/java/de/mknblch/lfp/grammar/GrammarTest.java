@@ -28,13 +28,6 @@ public class GrammarTest {
     }
 
     @Test
-    public void testNullable() throws Exception {
-        assertContains(bnf4.nullable(), "A", "B", "D", "E");
-        assertContains(bnf5.nullable(), "A", "C");
-        assertContains(bnf6.nullable(), "A");
-    }
-
-    @Test
     public void testIsEpsilon() throws Exception {
         assertTrue(bnf4.isEpsilon("EPS"));
         assertTrue(bnf5.isEpsilon("E"));
@@ -56,41 +49,6 @@ public class GrammarTest {
         assertContains(bnf6.nonTerminals(), "S", "A", "B");
     }
 
-
-    @Test
-    public void testIsSymbol() throws Exception {
-
-    }
-
-    @Test
-    public void testRules() throws Exception {
-
-    }
-
-    @Test
-    public void testGetStartSymbol() throws Exception {
-
-    }
-
-    @Test
-    public void testGetEpsilonSymbol() throws Exception {
-
-    }
-
-    @Test
-    public void testGetExclusionMap() throws Exception {
-
-    }
-
-    @Test
-    public void testGetPatternMap() throws Exception {
-
-    }
-
-    @Test
-    public void testGetRuleMap() throws Exception {
-
-    }
 
     private void assertContains(Set<String> result, String... expected) {
         assertEquals("Length mismatch! Expected: " + String.join(",", expected) + " Got: " + result,

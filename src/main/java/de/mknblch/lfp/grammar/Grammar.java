@@ -30,14 +30,6 @@ public class Grammar {
         this.ruleMap = ruleMap;
     }
 
-    public boolean isNullable(String symbol) {
-        return ruleMap.get(symbol).stream().anyMatch(this::isNullable);
-    }
-
-    public boolean isNullable(Rule rule) {
-        return rule.size() == 1 && rule.allEquals(epsilonSymbol);
-    }
-
     public boolean isEpsilon(String symbol) {
         return epsilonSymbol.equals(symbol);
     }
@@ -62,12 +54,6 @@ public class Grammar {
         return ruleMap.keySet();
     }
 
-    public Set<String> nullable() {
-        return ruleMap.keySet()
-                .stream()
-                .filter(this::isNullable)
-                .collect(Collectors.toSet());
-    }
 
     public boolean isSymbol(String symbol) {
         return END_SYMBOL.equals(symbol) || isTerminal(symbol) || isNonTerminal(symbol);

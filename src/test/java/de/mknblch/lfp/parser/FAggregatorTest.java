@@ -20,7 +20,7 @@ public class FAggregatorTest {
 
     @BeforeClass
     public static void init() throws GrammarException {
-        bnf = GrammarReader.loadResource("err.lng");
+        bnf = GrammarReader.loadResource("bnf6.lng");
     }
 
     @Test
@@ -35,6 +35,7 @@ public class FAggregatorTest {
         System.out.println("NULLABLE: " + aggregator.getNullable());
         System.out.println("FIRST: " + aggregator.getFirstSet());
         System.out.println("FIRSTRULES: " + aggregator.getFirstRules());
+        System.out.println("FOLLOWS: " + aggregator.getFollowSet());
     }
     
 }

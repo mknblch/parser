@@ -19,12 +19,12 @@ public class Rule implements Iterable<String> {
         this.right = right;
     }
 
-    public List<String> right() {
-        return right;
+    public String left() {
+        return left;
     }
 
-    public boolean allEquals(String symbol) {
-        return right.stream().allMatch(symbol::equals);
+    public List<String> right() {
+        return right;
     }
 
     public List<Integer> find(String symbol) {
@@ -42,28 +42,17 @@ public class Rule implements Iterable<String> {
         return right.get(index);
     }
 
-    public String join (String delimiter) {
-        final StringBuilder builder = new StringBuilder();
-        for (String symbol : right) {
-            if (builder.length() != 0) {
-                builder.append(delimiter);
-            }
-            builder.append(symbol);
-        }
-        return builder.toString();
-    }
-
     public int size() {
         return right.size();
     }
 
     @Override
     public String toString() {
-        return left + " -> " + join(" ");
+        return left + " -> " + String.join(" ", right);
     }
 
     @Override
-    public Iterator iterator() {
+    public Iterator<String> iterator() {
         return right.iterator();
     }
 
