@@ -21,14 +21,19 @@ public class ParserTest {
 
     @BeforeClass
     public static void init() throws GrammarException {
+        bnf2 = GrammarReader.loadResource("bnf2.lng");
+        bnf3 = GrammarReader.loadResource("bnf3.lng");
+        bnf4 = GrammarReader.loadResource("bnf4.lng");
+        bnf5 = GrammarReader.loadResource("bnf5.lng");
         bnf6 = GrammarReader.loadResource("bnf6.lng");
     }
 
     @Test
     public void testParse() throws Exception {
 
-        final Parser parser = new Parser(bnf6);
+        System.out.println(bnf3);
+        final Parser parser = new Parser(bnf3);
 
-        parser.parse("aabaa");
+        parser.parse("(3*(3+1) + (1+1))");
     }
 }

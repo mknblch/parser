@@ -10,6 +10,6 @@
 %b ::= b
 
 ;; Rules
-S ::= A S A | EPSILON | B
+S ::= A S A | EPSILON
 A ::= %a
 B ::= %b

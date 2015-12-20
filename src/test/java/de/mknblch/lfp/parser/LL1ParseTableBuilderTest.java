@@ -12,7 +12,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * Created by mknblch on 19.12.2015.
  */
-public class LL1AggregatorTest {
+public class LL1ParseTableBuilderTest {
 
     private static final Logger LOGGER = getLogger(AggregatorTest.class);
 
@@ -30,19 +30,27 @@ public class LL1AggregatorTest {
 
     @Test
     public void testBnf4() throws Exception {
-        LOGGER.info("BNF4\n{}", new LL1Aggregator(bnf4).build()
-                .getParseTable());
+        testGrammar(bnf4);
     }
 
     @Test
     public void testBnf5() throws Exception {
-        LOGGER.info("BNF5\n{}", new LL1Aggregator(bnf5).build()
-                .getParseTable());
+        testGrammar(bnf5);
     }
 
     @Test
-    public void testBnf6() throws Exception {
-        LOGGER.info("BNF6\n{}", new LL1Aggregator(bnf6).build()
-                .getParseTable());
+    public void testBnf3() throws Exception {
+        testGrammar(bnf3);
+    }
+
+    @Test
+    public void testBnf2() throws Exception {
+        testGrammar(bnf2);
+    }
+
+    private void testGrammar(Grammar grammar) throws GrammarException {
+        System.out.println("------------------------------------");
+        System.out.println(grammar);
+        System.out.println(new LL1ParseTableBuilder(grammar).build());
     }
 }

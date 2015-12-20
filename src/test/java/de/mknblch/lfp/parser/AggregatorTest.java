@@ -20,6 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class AggregatorTest {
 
     private static final Logger LOGGER = getLogger(AggregatorTest.class);
+    private static final boolean WITH_EPSILON = true;
 
     private static Grammar bnf4, bnf5, err;
 

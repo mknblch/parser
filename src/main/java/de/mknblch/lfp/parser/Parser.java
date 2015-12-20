@@ -21,11 +21,11 @@ public class Parser {
 
     public Parser(Grammar grammar) throws GrammarException {
         this.grammar = grammar;
-        this.parseTable = new LL1Aggregator(grammar).build().getParseTable();
+        this.parseTable = new LL1ParseTableBuilder(grammar).build();
     }
 
     public Node parse(String input) throws ParseException, LexerException, GrammarException {
-        parseTable = new LL1Aggregator(grammar).build().getParseTable();
+        parseTable = new LL1ParseTableBuilder(grammar).build();
         System.out.println(parseTable);
         return parse(new Lexer(grammar).tokenize(input));
     }
