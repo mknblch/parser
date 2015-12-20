@@ -80,8 +80,8 @@ public class AggregatorTest {
         LOGGER.info("FOLLOW: {}", follow);
         assertContains(follow, "A", "%b");
         assertContains(follow, "B", "%c", "$");
-        assertContains(follow, "C", "$");
         assertContains(follow, "S", "$");
+        assertContains(follow, "C", "$");
     }
 
     private void assertContains(Map<String, Set<String>> result, String symbol, String... expected) {
@@ -95,12 +95,19 @@ public class AggregatorTest {
     }
 
     private Map<String, Set<String>> getFirsts(Grammar grammar) throws GrammarException {
-        return new FirstSetAggregator(grammar).aggregate().getFirstSet();
+
+        return new Aggregator(grammar).aggregate().getFirstSet().getMap();
+
+
+//        return new FirstSetAggregator(grammar).aggregate().getFirstSet();
     }
 
     private Map<String, Set<String>> getFollows(Grammar grammar) throws GrammarException {
-        return new FollowSetAggregator(grammar, new FirstSetAggregator(grammar).aggregate())
-                .aggregate()
-                .getFollowMap();
+
+        return new Aggregator(grammar).aggregate().getFollowSet().getMap();
+
+//        return new FollowSetAggregator(grammar, new FirstSetAggregator(grammar).aggregate())
+//                .aggregate()
+//                .getFollowMap();
     }
 }

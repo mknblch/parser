@@ -16,8 +16,8 @@ public class Bag<K, T> {
         return bag.entrySet();
     }
 
-    public List<T> values() {
-        return bag.values().stream().flatMap(Set::stream).collect(Collectors.toList());
+    public List<Set<T>> values() {
+        return bag.values().stream().collect(Collectors.toList());
     }
 
     public Map<K, Set<T>> getMap() {
@@ -33,6 +33,9 @@ public class Bag<K, T> {
     }
 
     public boolean putAll(K key, Collection<T> elements) {
+        if (null == elements) {
+            return false;
+        }
         return getOrCreate(key).addAll(elements);
     }
 
@@ -53,11 +56,6 @@ public class Bag<K, T> {
             }
         }
         return changed;
-    }
-
-    public Bag<K, T> forEachValue(Consumer<T> consumer) {
-        values().forEach(consumer);
-        return this;
     }
 
     @Override

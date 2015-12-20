@@ -6,10 +6,35 @@ import de.mknblch.lfp.grammar.Rule;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Created by mknblch on 20.12.2015.
+ */
+
+/*
+nullable = {}
+foreach nonterminal X:
+    first(X)={}
+    follow(X)={}
+for each terminal Y:
+    first(Y)={Y}
+    follow(Y)={}
+
+repeat
+    foreach grammar rule X ::= Y(1) ... Y(k)
+        if k=0 or {Y(1),...,Y(k)} subset of nullable then
+            nullable = nullable union {X}
+        for i = 1 to k
+            if i=1 or {Y(1),...,Y(i-1)} subset of nullable then
+                first(X) = first(X) union first(Y(i))
+            for j = i+1 to k
+                if i=k or {Y(i+1),...Y(k)} subset of nullable then
+                    follow(Y(i)) = follow(Y(i)) union follow(X)
+                if i+1=j or {Y(i+1),...,Y(j-1)} subset of nullable then
+                    follow(Y(i)) = follow(Y(i)) union first(Y(j))
+until none of nullable,first,follow changed in last iteration
  */
 public class Aggregator {
 
@@ -29,8 +54,21 @@ public class Aggregator {
         followSet = new Bag<>();
         nullable = new HashSet<>();
 
+
+    }
+
+    private void initialize() {
+        //        // nullable(E) = E
+        nullable.add(grammar.getEpsilonSymbol());
+
         // First(terminal) = terminal
         grammar.terminals().forEach(t -> firstSet.put(t, t));
+        grammar.rules().stream()
+                .filter(grammar::isEpsilon)
+                .forEach(rule -> {
+                    nullable.add(rule.left);
+                    firstSet.put(rule.left, grammar.getEpsilonSymbol());
+                });
 
         // Follow(S) = $
         followSet.put(grammar.getStartSymbol(), Grammar.END_SYMBOL);
@@ -56,13 +94,8 @@ public class Aggregator {
         changed |= nullable.add(symbol);
     }
 
-    private void addFirst(Rule rule, String first) {
-        changed |= firstSet.put(rule.left, first);
-        firstRules.put(rule, first);
-    }
-
-    private void addAllFirst(Rule rule, Collection<String> firsts) {
-        changed |= firstSet.putAll(rule.left, firsts);
+    private void addFirst(Rule rule, Collection<String> firsts) {
+        changed |= firstSet.putAll(rule.left(), firsts);
         firstRules.putAll(rule, firsts);
     }
 
@@ -71,89 +104,56 @@ public class Aggregator {
     }
 
     private void addFollow(String symbol, Collection<String> firsts) {
-        changed |= followSet.putAll(symbol, firsts);
+        if (null == firsts) {
+            return;
+        }
+        firsts.stream()
+                .filter(grammar::isSymbol) // omit epsilon
+                .forEach(f -> addFollow(symbol, f));
     }
 
-    /*
+    public Aggregator aggregate() {
 
-repeat
-  foreach grammar rule X ::= Y(1) ... Y(k)
+        initialize();
 
-    ...
-until none of nullable,first,follow changed in last iteration
-     */
-    public void aggregate() {
         do {
             changed = false;
             grammar.rules().forEach(this::aggregate);
         } while (changed);
-
-        enhance();
+        return this;
     }
 
-    private void enhance() {
-
-        nullable.forEach(s -> firstSet.put(s, grammar.getEpsilonSymbol()));
-    }
 
     /*
-    if k=0 or {Y(1),...,Y(k)} subset of nullable then
-        nullable = nullable union {X}
-    for i = 1 to k
-        if i=1 or {Y(1),...,Y(i-1)} subset of nullable then
+    for i = 0 to k
+        if i=0 or {Y(0),...,Y(i-1)} subset of nullable then
             first(X) = first(X) union first(Y(i))
+        if i=k or {Y(i+1),...Y(k)} subset of nullable then
+            follow(Y(i)) = follow(Y(i)) union follow(X)
         for j = i+1 to k
-            if i=k or {Y(i+1),...Y(k)} subset of nullable then
-                follow(Y(i)) = follow(Y(i)) union follow(X)
             if i+1=j or {Y(i+1),...,Y(j-1)} subset of nullable then
                 follow(Y(i)) = follow(Y(i)) union first(Y(j))
      */
     private void aggregate(Rule rule) {
 
-        aggregateNullable(rule);
-        aggregateFirst(rule);
-        aggregateFollow(rule);
-    }
-
-    private void aggregateFollow(Rule rule) {
-
+        if (grammar.isEpsilon(rule) || nullable.containsAll(rule.right())) {
+            addNullable(rule.left);
+        }
         final int k = rule.size();
-
         for (int i = 0; i < k; i++) {
             final String symbol = rule.get(i);
+            if (i == 0 || nullable.containsAll(rule.right().subList(0, i))) {
+                addFirst(rule, firstSet.get(symbol));
+            }
+            if (i == k || nullable.containsAll(rule.right().subList(i + 1, k))) {
+                addFollow(symbol, followSet.get(rule.left));
+            }
             for (int j = i+1; j < k; j++) {
-                if (i == k-1 || nullable.containsAll(rule.right().subList(i+1, k))) {
-                    addFollow(symbol, followSet.get(rule.left));
-                }
-
-                if (i + 1 == j || nullable.containsAll(rule.right().subList(i+1, j-1))) {
+                final List<String> subl3 = rule.right().subList(i + 1, j);
+                if (i + 1 == j || nullable.containsAll(subl3)) {
                     addFollow(symbol, firstSet.get(rule.get(j)));
                 }
             }
         }
     }
-
-    private void aggregateFirst(Rule rule) {
-        for (int i = 0; i < rule.size(); i++) {
-            final String symbol = rule.get(i);
-            if (grammar.isTerminal(symbol)) {
-                addFirst(rule, symbol);
-                return;
-            }
-            if (grammar.isNonTerminal(symbol)) {
-                addAllFirst(rule, firstSet.get(symbol));
-                if (!nullable.contains(symbol)) {
-                    return;
-                }
-            }
-        }
-    }
-
-    private void aggregateNullable(Rule rule) {
-        if (grammar.isEpsilon(rule) || nullable.containsAll(rule.right())) {
-            addNullable(rule.left);
-        }
-    }
-
-
 }

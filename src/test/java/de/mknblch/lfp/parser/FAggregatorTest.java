@@ -20,7 +20,7 @@ public class FAggregatorTest {
 
     @BeforeClass
     public static void init() throws GrammarException {
-        bnf = GrammarReader.loadResource("bnf6.lng");
+        bnf = GrammarReader.loadResource("bnf5.lng");
     }
 
     @Test
