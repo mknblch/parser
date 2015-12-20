@@ -54,7 +54,7 @@ public class DumpHelper {
             if (buffer.length() != 0) {
                 buffer.append(" | ");
             }
-            buffer.append(rule);
+            buffer.append(String.join(" ", rule.right()));
         }
         return buffer.toString();
     }

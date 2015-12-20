@@ -64,7 +64,14 @@ public class FirstSetAggregator {
     public Set<String> first(Rule rule) {
         final Set<String> ret = new HashSet<>();
         for (int index = 0; index < rule.size(); index++) {
-            final Set<String> first = first(rule.get(index));
+            final String symbol = rule.get(index);
+
+            if (symbol.equals(rule.left)) { // TODO
+                continue;
+            }
+
+
+            final Set<String> first = first(symbol);
             ret.addAll(first);
             if (!first.contains(grammar.getEpsilonSymbol())) {
                 return ret;

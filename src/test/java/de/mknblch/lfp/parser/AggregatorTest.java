@@ -21,16 +21,20 @@ public class AggregatorTest {
 
     private static final Logger LOGGER = getLogger(AggregatorTest.class);
 
-    private static Grammar bnf1, bnf2, bnf3, bnf4, bnf5, bnf6;
+    private static Grammar bnf4, bnf5, err;
 
     @BeforeClass
     public static void init() throws GrammarException {
-        bnf1 = GrammarReader.loadResource("bnf.lng");
-        bnf2 = GrammarReader.loadResource("bnf2.lng");
-        bnf3 = GrammarReader.loadResource("bnf3.lng");
         bnf4 = GrammarReader.loadResource("bnf4.lng");
         bnf5 = GrammarReader.loadResource("bnf5.lng");
-        bnf6 = GrammarReader.loadResource("bnf6.lng");
+        err = GrammarReader.loadResource("err.lng");
+    }
+
+    @Test
+    public void testFirstErr() throws Exception {
+
+        final Map<String, Set<String>> first = getFirsts(err);
+        LOGGER.info("FIRST: {}", first);
     }
 
     @Test
@@ -78,40 +82,6 @@ public class AggregatorTest {
         assertContains(follow, "B", "%c", "$");
         assertContains(follow, "C", "$");
         assertContains(follow, "S", "$");
-    }
-
-    @Test
-    public void testBnf3() throws Exception {
-        final Map<String, Set<String>> first = getFirsts(bnf3);
-        final Map<String, Set<String>> follow = getFollows(bnf3);
-        LOGGER.info("FIRST: {}", first);
-        LOGGER.info("FOLLOW: {}", follow);
-    }
-
-    @Test
-    public void testBnf2() throws Exception {
-        final Map<String, Set<String>> first = getFirsts(bnf2);
-        final Map<String, Set<String>> follow = getFollows(bnf2);
-        LOGGER.info("FIRST: {}", first);
-        LOGGER.info("FOLLOW: {}", follow);
-    }
-
-
-    @Test
-    public void testBnf() throws Exception {
-        final Map<String, Set<String>> first = getFirsts(bnf1);
-        final Map<String, Set<String>> follow = getFollows(bnf1);
-        LOGGER.info("FIRST: {}", first);
-        LOGGER.info("FOLLOW: {}", follow);
-    }
-
-
-    @Test
-    public void testBnf6() throws Exception {
-        final Map<String, Set<String>> first = getFirsts(bnf6);
-        final Map<String, Set<String>> follow = getFollows(bnf6);
-        LOGGER.info("FIRST: {}", first);
-        LOGGER.info("FOLLOW: {}", follow);
     }
 
     private void assertContains(Map<String, Set<String>> result, String symbol, String... expected) {

@@ -28,14 +28,12 @@ public class Bag<K, T> {
         return bag.get(key);
     }
 
-    public Bag<K, T> put(K key, T element) {
-        getOrCreate(key).add(element);
-        return this;
+    public boolean put(K key, T element) {
+        return getOrCreate(key).add(element);
     }
 
-    public Bag<K, T> putAll(K key, Collection<T> elements) {
-        getOrCreate(key).addAll(elements);
-        return this;
+    public boolean putAll(K key, Collection<T> elements) {
+        return getOrCreate(key).addAll(elements);
     }
 
     public void clear() {

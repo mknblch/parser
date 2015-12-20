@@ -1,6 +1,6 @@
 ;; Options
 #START ::= S
-#EPSILON ::= EPSILON
+#EPSILON ::= E
 
 ;; Omit
 ~DELIMITER ::= \s+|;
@@ -10,6 +10,6 @@
 %b ::= b
 
 ;; Rules
-S ::= A S A | EPSILON | B
+S ::= A S A | B
 A ::= %a
-B ::= %b
+B ::= %b | E

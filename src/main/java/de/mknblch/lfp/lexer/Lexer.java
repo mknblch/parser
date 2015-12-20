@@ -54,7 +54,6 @@ public class Lexer {
                     "'");
         }
 
-        tokens.add(new Token(Grammar.END_SYMBOL, Grammar.END_SYMBOL));
         return tokens;
     }
 

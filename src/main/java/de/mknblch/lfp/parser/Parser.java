@@ -24,39 +24,45 @@ public class Parser {
         this.parseTable = new LL1Aggregator(grammar).build().getParseTable();
     }
 
-    public void parse(String input) throws ParseException, LexerException, GrammarException {
+    public Node parse(String input) throws ParseException, LexerException, GrammarException {
         parseTable = new LL1Aggregator(grammar).build().getParseTable();
-        parse(new Lexer(grammar).tokenize(input));
+        System.out.println(parseTable);
+        return parse(new Lexer(grammar).tokenize(input));
     }
 
     private boolean isReducible(String head, Token token) {
         return (grammar.isTerminal(head) || Grammar.END_SYMBOL.equals(head)) && token.identifier.equals(head);
     }
 
-    private void parse(List<Token> input) throws ParseException {
+    private Node parse(List<Token> tokens) throws ParseException {
         final Stack<String> stack = prepareStack();
+        tokens.add(new Token(Grammar.END_SYMBOL, Grammar.END_SYMBOL));
+        final NodeBuilder nodeBuilder = new NodeBuilder(grammar.getStartSymbol());
 
-        for (int i = 0; i < input.size(); ) {
-            final Token token = input.get(i);
+        for (int index = 0; index < tokens.size(); ) {
+            final Token token = tokens.get(index);
             final String head = stack.pop();
-
             if (isReducible(head, token)) {
-                i++;
+                index++;
+//                System.out.println("reducing " + head);
+                nodeBuilder.reduce(head);
                 continue;
             } else if (grammar.isNonTerminal(head)) {
-
                 final Rule rule = parseTable.get(head, token.identifier);
                 if (null == rule) {
-                    throw new ParseException("Unable to parse " + token + " at " + i);
+                    throw new ParseException("Unable to parse " + token + " at " + index);
                 }
-
                 if (!grammar.isEpsilon(rule)) {
                     pushReversed(stack, rule);
                 }
+                nodeBuilder.reduce(rule);
+//                System.out.println("Substituting from " + lastSymbol + " -> " + rule);
                 continue;
             }
-            throw new ParseException("Unable to parse " + token + " at " + i);
+            throw new ParseException("Unable to parse " + token + " at " + index);
         }
+
+        return null;
     }
 
     private void pushReversed(Stack<String> stack, Rule rule) {
@@ -67,7 +73,7 @@ public class Parser {
 
 
     private Stack<String> prepareStack() {
-        Stack<String> stack = new Stack<>();
+        final Stack<String> stack = new Stack<>();
         stack.clear();
         stack.push(Grammar.END_SYMBOL);
         stack.push(grammar.getStartSymbol());

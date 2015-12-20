@@ -1,9 +1,7 @@
-package de.mknblch.lfp;
+package de.mknblch.lfp.lexer;
 
 import de.mknblch.lfp.grammar.Grammar;
 import de.mknblch.lfp.grammar.GrammarReader;
-import de.mknblch.lfp.lexer.Lexer;
-import de.mknblch.lfp.lexer.Token;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;

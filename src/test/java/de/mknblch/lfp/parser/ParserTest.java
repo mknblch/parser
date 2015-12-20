@@ -29,6 +29,6 @@ public class ParserTest {
 
         final Parser parser = new Parser(bnf6);
 
-        parser.parse("aba");
+        parser.parse("aabaa");
     }
 }

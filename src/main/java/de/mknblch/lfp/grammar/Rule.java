@@ -1,16 +1,14 @@
 package de.mknblch.lfp.grammar;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.IntStream;
+import java.util.function.Consumer;
 
 /**
  * @author martinknobloch
  */
-public class Rule {
+public class Rule implements Iterable<String> {
 
     public final String left;
 
@@ -19,6 +17,10 @@ public class Rule {
     public Rule(String left, List<String> right) {
         this.left = left;
         this.right = right;
+    }
+
+    public List<String> right() {
+        return right;
     }
 
     public boolean allEquals(String symbol) {
@@ -59,4 +61,10 @@ public class Rule {
     public String toString() {
         return left + " -> " + join(" ");
     }
+
+    @Override
+    public Iterator iterator() {
+        return right.iterator();
+    }
+
 }
