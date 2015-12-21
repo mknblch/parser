@@ -14,32 +14,6 @@ import java.util.Set;
 /**
  * Created by mknblch on 20.12.2015.
  */
-
-/*
-http://lara.epfl.ch/w/cc09:algorithm_for_first_and_follow_sets
-
-    nullable = {}
-    foreach nonterminal X:
-        first(X)={}
-        follow(X)={}
-    for each terminal Y:
-        first(Y)={Y}
-        follow(Y)={}
-
-    repeat
-        foreach grammar rule X ::= Y(1) ... Y(k)
-            if k=0 or {Y(1),...,Y(k)} subset of nullable then
-                nullable = nullable union {X}
-            for i = 1 to k
-                if i=1 or {Y(1),...,Y(i-1)} subset of nullable then
-                    first(X) = first(X) union first(Y(i))
-                for j = i+1 to k
-                    if i=k or {Y(i+1),...Y(k)} subset of nullable then
-                        follow(Y(i)) = follow(Y(i)) union follow(X)
-                    if i+1=j or {Y(i+1),...,Y(j-1)} subset of nullable then
-                        follow(Y(i)) = follow(Y(i)) union first(Y(j))
-    until none of nullable,first,follow changed in last iteration
- */
 public class Aggregator {
 
     private final Bag<Rule, String> firstRules;
@@ -117,7 +91,7 @@ public class Aggregator {
         // First(terminal) = terminal
         grammar.terminals().forEach(t -> firstSet.put(t, t));
 
-        //
+        // init epsilon in first sets
         grammar.rules().stream()
                 .filter(grammar::isEpsilon)
                 .forEach(rule -> {
@@ -134,13 +108,13 @@ public class Aggregator {
 
     /*
     for i = 0 to k
-        if i=0 or {Y(0),...,Y(i-1)} subset of nullable then
+        if i=0 or {Y(0),...,Y(i-1)} all in nullable then
             first(X) = first(X) union first(Y(i))
-        if i=k or {Y(i+1),...Y(k)} subset of nullable then
-            follow(Y(i)) = follow(Y(i)) union follow(X)
+        if i=k or {Y(i+1),...Y(k)} all nullable then
+            follow(Y(i)) add all of follow(X)
         for j = i+1 to k
             if i+1=j or {Y(i+1),...,Y(j-1)} subset of nullable then
-                follow(Y(i)) = follow(Y(i)) union first(Y(j))
+                follow(Y(i)) add all of first(Y(j))
      */
     private void process(Rule rule) {
 
@@ -157,8 +131,7 @@ public class Aggregator {
                 addFollow(symbol, followSet.get(rule.left));
             }
             for (int j = i + 1; j < k; j++) {
-                final List<String> subl3 = rule.right().subList(i + 1, j);
-                if (i + 1 == j || nullable.containsAll(subl3)) {
+                if (i + 1 == j || nullable.containsAll(rule.right().subList(i + 1, j))) {
                     addFollow(symbol, firstSet.get(rule.get(j)));
                 }
             }
