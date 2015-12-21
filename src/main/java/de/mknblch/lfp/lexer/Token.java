@@ -8,7 +8,7 @@ public class Token {
     public final String identifier;
     public final String literal;
 
-    public Token(String identifier, String literal) {
+    Token(String identifier, String literal) {
         this.identifier = identifier;
         this.literal = literal;
     }

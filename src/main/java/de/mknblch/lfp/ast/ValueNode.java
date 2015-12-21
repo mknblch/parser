@@ -1,4 +1,4 @@
-package de.mknblch.lfp.parser;
+package de.mknblch.lfp.ast;
 
 import de.mknblch.lfp.lexer.Token;
 
@@ -7,16 +7,10 @@ import de.mknblch.lfp.lexer.Token;
  */
 public class ValueNode implements Node {
 
-    private final String symbol;
     private final Token value;
 
-    public ValueNode(String symbol, Token value) {
-        this.symbol = symbol;
+    public ValueNode(Token value) {
         this.value = value;
-    }
-
-    public String getSymbol() {
-        return symbol;
     }
 
     public Token getValue() {

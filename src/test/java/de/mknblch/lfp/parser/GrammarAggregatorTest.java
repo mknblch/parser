@@ -2,8 +2,8 @@ package de.mknblch.lfp.parser;
 
 
 import de.mknblch.lfp.grammar.Grammar;
-import de.mknblch.lfp.grammar.GrammarException;
 import de.mknblch.lfp.grammar.GrammarReader;
+import de.mknblch.lfp.grammar.GrammarReaderException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -17,15 +17,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * Created by mknblch on 13.12.2015.
  */
-public class AggregatorTest {
+public class GrammarAggregatorTest {
 
-    private static final Logger LOGGER = getLogger(AggregatorTest.class);
-    private static final boolean WITH_EPSILON = true;
+    private static final Logger LOGGER = getLogger(GrammarAggregatorTest.class);
 
     private static Grammar bnf4, bnf5, err;
 
     @BeforeClass
-    public static void init() throws GrammarException {
+    public static void init() throws  GrammarReaderException {
         bnf4 = GrammarReader.loadResource("bnf4.lng");
         bnf5 = GrammarReader.loadResource("bnf5.lng");
         err = GrammarReader.loadResource("err.lng");
@@ -97,7 +96,7 @@ public class AggregatorTest {
 
     private Map<String, Set<String>> getFirsts(Grammar grammar) throws GrammarException {
 
-        return new Aggregator(grammar).aggregate().getFirstSet().getMap();
+        return new GrammarAggregator(grammar).aggregate().getFirstSet().getMap();
 
 
 //        return new FirstSetAggregator(grammar).aggregate().getFirstSet();
@@ -105,7 +104,7 @@ public class AggregatorTest {
 
     private Map<String, Set<String>> getFollows(Grammar grammar) throws GrammarException {
 
-        return new Aggregator(grammar).aggregate().getFollowSet().getMap();
+        return new GrammarAggregator(grammar).aggregate().getFollowSet().getMap();
 
 //        return new FollowSetAggregator(grammar, new FirstSetAggregator(grammar).aggregate())
 //                .aggregate()

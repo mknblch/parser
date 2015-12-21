@@ -32,7 +32,7 @@ public class LexerTest {
 
         final List<Token> tokens = lexer.tokenize("hallo(25);\twelt()");
         LOGGER.debug("Tokens {}", tokens);
-        assertEquals(7, tokens.size());
+        assertEquals(8, tokens.size());
     }
 
 }

@@ -21,19 +21,17 @@ public class GrammarReader {
     private static final GrammarReader INSTANCE = new GrammarReader();
 
     public static final String DELIMITER = "::=";
-
     public static final String EXCLUDE_PREFIX = "~";
     public static final String OPTION_PREFIX = "#";
     public static final String TERMINAL_PREFIX = "%";
-
     public static final String START_OPTION = "#START";
     public static final String EPSILON_OPTION = "#EPSILON";
 
-    private static final Pattern COMMENT_PATTERN = Pattern.compile("\\s*;.*");
+    private static final Pattern COMMENT_PATTERN = Pattern.compile("^;.*");
     private static final Pattern LINE_PATTERN =
             Pattern.compile("([^:= ]+)\\s*"+DELIMITER+"\\s*(.+)");
 
-    private Map<String, String> preProcess(InputStream iStream) throws GrammarException {
+    private Map<String, String> preProcess(InputStream iStream) throws GrammarReaderException {
         final Scanner scanner = new Scanner(iStream)
                 .useDelimiter(Pattern.compile("(\r?\n)+"));
         final Map<String, String> cache = new HashMap<>();
@@ -44,14 +42,14 @@ public class GrammarReader {
             }
             final Matcher matcher = LINE_PATTERN.matcher(line);
             if (!matcher.matches()) {
-                throw new GrammarException("Error at : " + line);
+                throw new GrammarReaderException("Error at : " + line);
             }
             cache.put(matcher.group(1), matcher.group(2));
         }
         return cache;
     }
 
-    public Grammar readGrammar(InputStream inputStream) throws GrammarException {
+    public Grammar readGrammar(InputStream inputStream) throws GrammarReaderException {
 
         final Map<String, String> cache = preProcess(inputStream);
 
@@ -66,6 +64,27 @@ public class GrammarReader {
                 exclusionMap,
                 patternMap,
                 ruleMap);
+    }
+
+    public static Grammar readFromString(String input) throws GrammarReaderException {
+        return INSTANCE.readGrammar(new ByteArrayInputStream(input.getBytes(Charset.defaultCharset())));
+    }
+
+    public static Grammar readFromString(String input, Charset charset) throws GrammarReaderException {
+        return INSTANCE.readGrammar(new ByteArrayInputStream(input.getBytes(charset)));
+    }
+
+    public static Grammar load(Path path) throws IOException, GrammarReaderException {
+        final InputStream iStream = Files.newInputStream(path, StandardOpenOption.READ);
+        return INSTANCE.readGrammar(iStream);
+    }
+
+    public static Grammar loadResource(String resource) throws GrammarReaderException {
+        final InputStream iStream = Thread
+                .currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream(resource);
+        return new GrammarReader().readGrammar(iStream);
     }
 
     private Map<String, String> makeProperties(Map<String, String> cache) {
@@ -135,27 +154,6 @@ public class GrammarReader {
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             (Map.Entry<String, String> e) -> Pattern.compile(e.getValue())));
-    }
-
-    public static Grammar readFromString(String input) throws GrammarException {
-        return INSTANCE.readGrammar(new ByteArrayInputStream(input.getBytes(Charset.defaultCharset())));
-    }
-
-    public static Grammar readFromString(String input, Charset charset) throws GrammarException {
-        return INSTANCE.readGrammar(new ByteArrayInputStream(input.getBytes(charset)));
-    }
-
-    public static Grammar load(Path path) throws IOException, GrammarException {
-        final InputStream iStream = Files.newInputStream(path, StandardOpenOption.READ);
-        return INSTANCE.readGrammar(iStream);
-    }
-
-    public static Grammar loadResource(String resource) throws GrammarException {
-        final InputStream iStream = Thread
-                .currentThread()
-                .getContextClassLoader()
-                .getResourceAsStream(resource);
-        return new GrammarReader().readGrammar(iStream);
     }
 
 }

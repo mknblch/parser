@@ -2,10 +2,7 @@ package de.mknblch.lfp.parser;
 
 import de.mknblch.lfp.common.Table;
 import de.mknblch.lfp.grammar.Grammar;
-import de.mknblch.lfp.grammar.GrammarException;
 import de.mknblch.lfp.grammar.Rule;
-import de.mknblch.lfp.lexer.Lexer;
-import de.mknblch.lfp.lexer.LexerException;
 import de.mknblch.lfp.lexer.Token;
 
 import java.util.List;
@@ -14,38 +11,27 @@ import java.util.Stack;
 /**
  * Created by mknblch on 19.12.2015.
  */
-public class Parser {
+public abstract class Parser implements ParserHandler {
 
-    private final Grammar grammar;
-    private Table<String, String, Rule> parseTable;
+    protected final Grammar grammar;
+    protected final Table<String, String, Rule> parseTable;
 
-    public Parser(Grammar grammar) throws GrammarException {
+    protected Parser(Grammar grammar, Table<String, String, Rule> parseTable) {
         this.grammar = grammar;
-        this.parseTable = new LL1ParseTableBuilder(grammar).build();
+        this.parseTable = parseTable;
     }
 
-    public Node parse(String input) throws ParseException, LexerException, GrammarException {
-        parseTable = new LL1ParseTableBuilder(grammar).build();
-        System.out.println(parseTable);
-        return parse(new Lexer(grammar).tokenize(input));
-    }
-
-    private boolean isReducible(String head, Token token) {
-        return (grammar.isTerminal(head) || Grammar.END_SYMBOL.equals(head)) && token.identifier.equals(head);
-    }
-
-    private Node parse(List<Token> tokens) throws ParseException {
+    public void parse(List<Token> input) throws ParseException {
+        onInitialize();
         final Stack<String> stack = prepareStack();
-        tokens.add(new Token(Grammar.END_SYMBOL, Grammar.END_SYMBOL));
-        final NodeBuilder nodeBuilder = new NodeBuilder(grammar.getStartSymbol());
-
-        for (int index = 0; index < tokens.size(); ) {
-            final Token token = tokens.get(index);
+        for (int index = 0; index < input.size(); ) {
+            final Token token = input.get(index);
             final String head = stack.pop();
             if (isReducible(head, token)) {
+                if (!Grammar.END_SYMBOL.equals(token.identifier)) {
+                    onToken(token);
+                }
                 index++;
-//                System.out.println("reducing " + head);
-                nodeBuilder.reduce(head);
                 continue;
             } else if (grammar.isNonTerminal(head)) {
                 final Rule rule = parseTable.get(head, token.identifier);
@@ -55,14 +41,12 @@ public class Parser {
                 if (!grammar.isEpsilon(rule)) {
                     pushReversed(stack, rule);
                 }
-                nodeBuilder.reduce(rule);
-//                System.out.println("Substituting from " + lastSymbol + " -> " + rule);
+                onRule(rule);
                 continue;
             }
             throw new ParseException("Unable to parse " + token + " at " + index);
         }
-
-        return null;
+        onDone();
     }
 
     private void pushReversed(Stack<String> stack, Rule rule) {
@@ -71,12 +55,15 @@ public class Parser {
         }
     }
 
-
     private Stack<String> prepareStack() {
         final Stack<String> stack = new Stack<>();
         stack.clear();
         stack.push(Grammar.END_SYMBOL);
         stack.push(grammar.getStartSymbol());
         return stack;
+    }
+
+    private boolean isReducible(String head, Token token) {
+        return (grammar.isTerminal(head) || Grammar.END_SYMBOL.equals(head)) && token.identifier.equals(head);
     }
 }

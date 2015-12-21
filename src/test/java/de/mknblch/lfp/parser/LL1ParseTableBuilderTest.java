@@ -1,8 +1,8 @@
 package de.mknblch.lfp.parser;
 
 import de.mknblch.lfp.grammar.Grammar;
-import de.mknblch.lfp.grammar.GrammarException;
 import de.mknblch.lfp.grammar.GrammarReader;
+import de.mknblch.lfp.grammar.GrammarReaderException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -14,12 +14,12 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class LL1ParseTableBuilderTest {
 
-    private static final Logger LOGGER = getLogger(AggregatorTest.class);
+    private static final Logger LOGGER = getLogger(GrammarAggregatorTest.class);
 
     private static Grammar bnf1, bnf2, bnf3, bnf4, bnf5, bnf6;
 
     @BeforeClass
-    public static void init() throws GrammarException {
+    public static void init() throws GrammarReaderException {
         bnf1 = GrammarReader.loadResource("bnf.lng");
         bnf2 = GrammarReader.loadResource("bnf2.lng");
         bnf3 = GrammarReader.loadResource("bnf3.lng");

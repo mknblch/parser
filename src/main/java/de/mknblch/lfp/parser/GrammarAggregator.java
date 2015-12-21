@@ -1,20 +1,17 @@
 package de.mknblch.lfp.parser;
 
 import de.mknblch.lfp.common.Bag;
-import de.mknblch.lfp.common.Table;
 import de.mknblch.lfp.grammar.Grammar;
-import de.mknblch.lfp.grammar.GrammarException;
 import de.mknblch.lfp.grammar.Rule;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
  * Created by mknblch on 20.12.2015.
  */
-public class Aggregator {
+public class GrammarAggregator {
 
     private final Bag<Rule, String> firstRules;
     private final Bag<String, String> firstSet;
@@ -25,7 +22,7 @@ public class Aggregator {
     private boolean withEpsilon = true;
     private boolean changed;
 
-    public Aggregator(Grammar grammar) {
+    public GrammarAggregator(Grammar grammar) {
         this.grammar = grammar;
         firstSet = new Bag<>();
         firstRules = new Bag<>();
@@ -33,13 +30,9 @@ public class Aggregator {
         nullable = new HashSet<>();
     }
 
-    public Aggregator withEpsilon(boolean withEpsilon) {
+    public GrammarAggregator withEpsilon(boolean withEpsilon) {
         this.withEpsilon = withEpsilon;
         return this;
-    }
-
-    public Set<String> first(String symbol) {
-        return firstSet.get(symbol);
     }
 
     public Set<String> first(Rule rule) {
@@ -50,7 +43,7 @@ public class Aggregator {
         return followSet.get(symbol);
     }
 
-    public Set<String> getNullable() {
+    public Set<String> getNullableSet() {
         return nullable;
     }
 
@@ -66,44 +59,13 @@ public class Aggregator {
         return followSet;
     }
 
-    public Aggregator aggregate() {
-
+    public GrammarAggregator aggregate() {
         initialize(withEpsilon);
-
         do {
             changed = false;
             grammar.rules().forEach(this::process);
         } while (changed);
         return this;
-    }
-
-    private void initialize(boolean withEpsilon) {
-
-        // reset
-        nullable.clear();
-        firstSet.clear();
-        firstRules.clear();
-        followSet.clear();
-
-        // nullable(E) = E
-        nullable.add(grammar.getEpsilonSymbol());
-
-        // First(terminal) = terminal
-        grammar.terminals().forEach(t -> firstSet.put(t, t));
-
-        // init epsilon in first sets
-        grammar.rules().stream()
-                .filter(grammar::isEpsilon)
-                .forEach(rule -> {
-                    nullable.add(rule.left);
-                    if (withEpsilon) {
-                        firstSet.put(rule.left, grammar.getEpsilonSymbol());
-                        firstRules.put(rule, grammar.getEpsilonSymbol());
-                    }
-                });
-
-        // Follow(S) = $
-        followSet.put(grammar.getStartSymbol(), Grammar.END_SYMBOL);
     }
 
     /*
@@ -119,7 +81,7 @@ public class Aggregator {
     private void process(Rule rule) {
 
         if (grammar.isEpsilon(rule) || nullable.containsAll(rule.right())) {
-            addNullable(rule.left);
+            addNullable(rule.left());
         }
         final int k = rule.size();
         for (int i = 0; i < k; i++) {
@@ -128,7 +90,7 @@ public class Aggregator {
                 addFirst(rule, firstSet.get(symbol));
             }
             if (i == k || nullable.containsAll(rule.right().subList(i + 1, k))) {
-                addFollow(symbol, followSet.get(rule.left));
+                addFollow(symbol, followSet.get(rule.left()));
             }
             for (int j = i + 1; j < k; j++) {
                 if (i + 1 == j || nullable.containsAll(rule.right().subList(i + 1, j))) {
@@ -136,6 +98,30 @@ public class Aggregator {
                 }
             }
         }
+    }
+
+    private void initialize(boolean withEpsilon) {
+        // reset
+        nullable.clear();
+        firstSet.clear();
+        firstRules.clear();
+        followSet.clear();
+        // nullable(E) = E
+        nullable.add(grammar.getEpsilonSymbol());
+        // First(terminal) = terminal
+        grammar.terminals().forEach(t -> firstSet.put(t, t));
+        // init epsilon in nullable and first sets
+        grammar.rules().stream()
+                .filter(grammar::isEpsilon)
+                .forEach(rule -> {
+                    nullable.add(rule.left());
+                    if (withEpsilon) {
+                        firstSet.put(rule.left(), grammar.getEpsilonSymbol());
+                        firstRules.put(rule, grammar.getEpsilonSymbol());
+                    }
+                });
+        // Follow(S) = $
+        followSet.put(grammar.getStartSymbol(), Grammar.END_SYMBOL);
     }
 
 

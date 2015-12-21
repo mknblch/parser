@@ -1,4 +1,4 @@
-package de.mknblch.lfp.grammar;
+package de.mknblch.lfp.parser;
 
 /**
  * Created by mknblch on 05.12.2015.

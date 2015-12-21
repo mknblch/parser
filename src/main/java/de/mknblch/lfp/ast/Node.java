@@ -1,4 +1,4 @@
-package de.mknblch.lfp.parser;
+package de.mknblch.lfp.ast;
 
 import java.util.List;
 
@@ -7,5 +7,4 @@ import java.util.List;
  */
 public interface Node {
 
-    String getSymbol();
 }

@@ -2,7 +2,6 @@ package de.mknblch.lfp.parser;
 
 import de.mknblch.lfp.common.Table;
 import de.mknblch.lfp.grammar.Grammar;
-import de.mknblch.lfp.grammar.GrammarException;
 import de.mknblch.lfp.grammar.Rule;
 
 /**
@@ -11,11 +10,11 @@ import de.mknblch.lfp.grammar.Rule;
 public class LL1ParseTableBuilder {
 
     private final Grammar grammar;
-    private final Aggregator aggregator;
+    private final GrammarAggregator aggregator;
 
     public LL1ParseTableBuilder(Grammar grammar) {
         this.grammar = grammar;
-        aggregator = new Aggregator(grammar)
+        aggregator = new GrammarAggregator(grammar)
                 .aggregate();
     }
 
@@ -24,7 +23,7 @@ public class LL1ParseTableBuilder {
         for (Rule rule : grammar.rules()) {
             for (String first : aggregator.first(rule)) {
                 if (grammar.isEpsilon(first)) {
-                    for (String follow : aggregator.follow(rule.left)) {
+                    for (String follow : aggregator.follow(rule.left())) {
                         addToParseTable(parseTable, rule, follow);
                     }
                 } else {
@@ -36,9 +35,9 @@ public class LL1ParseTableBuilder {
     }
 
     private void addToParseTable(Table<String, String, Rule> parseTable, Rule rule, String symbol) throws GrammarException {
-        final Rule previous = parseTable.put(rule.left, symbol, rule);
+        final Rule previous = parseTable.put(rule.left(), symbol, rule);
         if (null != previous) {
-            throw new GrammarException("Not LL1! Multiple rules in " + rule.left);
+            throw new GrammarException("Not LL1! Multiple rules: " + " " + previous + ", " + rule);
         }
     }
 }

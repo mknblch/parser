@@ -10,6 +10,6 @@
 %b ::= b
 
 ;; Rules
-S ::= A S A | B
+S ::= A
 A ::= %a
-B ::= %b | E
+;; B ::= %b | E

@@ -19,7 +19,7 @@ public class Lexer {
         this.grammar = grammar;
     }
 
-    public List<Token> tokenize(final CharSequence input) throws LexerException {
+    public List<Token> tokenize(final CharSequence input) throws SyntaxException {
 
         final ArrayList<Token> tokens = new ArrayList<>();
 
@@ -47,12 +47,14 @@ public class Lexer {
                 continue outer;
             }
             // no possible rule found, throw exception
-            throw new LexerException("Parse Error at " +
+            throw new SyntaxException("Syntax error at " +
                     i +
                     " : '" +
                     rest.subSequence(0, Math.min(rest.length(), 20)) +
                     "'");
         }
+
+        tokens.add(new Token(Grammar.END_SYMBOL, Grammar.END_SYMBOL));
 
         return tokens;
     }
