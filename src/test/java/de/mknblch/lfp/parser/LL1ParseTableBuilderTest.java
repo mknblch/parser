@@ -3,6 +3,7 @@ package de.mknblch.lfp.parser;
 import de.mknblch.lfp.grammar.Grammar;
 import de.mknblch.lfp.grammar.GrammarReader;
 import de.mknblch.lfp.grammar.GrammarReaderException;
+import de.mknblch.lfp.parser.ll1.LL1ParseTableBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;

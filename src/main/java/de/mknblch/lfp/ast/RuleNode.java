@@ -4,6 +4,7 @@ import de.mknblch.lfp.grammar.Rule;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by mknblch on 19.12.2015.
@@ -20,6 +21,10 @@ public class RuleNode implements Node {
         childs = new ArrayList<>(rule.size());
     }
 
+    public Rule getRule() {
+        return rule;
+    }
+
     public List<Node> getChilds() {
         return childs;
     }
@@ -33,5 +38,10 @@ public class RuleNode implements Node {
 
     public boolean isSatisfied() {
         return offset == rule.size();
+    }
+
+    @Override
+    public String toString() {
+        return rule.left() + ":{ "+ String.join(", ", childs.stream().map(Node::toString).collect(Collectors.toList())) + " }";
     }
 }

@@ -20,14 +20,14 @@ public class ParserTest {
 
     @BeforeClass
     public static void init() throws GrammarReaderException {
-        bnf = GrammarReader.loadResource("bnf2.lng");
+        bnf = GrammarReader.loadResource("err.lng");
     }
 
     @Test
     public void testParse() throws Exception {
 
-        new TestParser(bnf).parse("aba");
-        System.out.println();
+
+        System.out.println(new TestParser(bnf).parse("aaaabaa"));
 
     }
 }

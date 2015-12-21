@@ -1,9 +1,10 @@
-package de.mknblch.lfp.parser;
+package de.mknblch.lfp.parser.ll1;
 
 import de.mknblch.lfp.common.Table;
 import de.mknblch.lfp.grammar.Grammar;
 import de.mknblch.lfp.grammar.Rule;
 import de.mknblch.lfp.lexer.Token;
+import de.mknblch.lfp.parser.ParseException;
 
 import java.util.List;
 import java.util.Stack;
@@ -11,7 +12,7 @@ import java.util.Stack;
 /**
  * Created by mknblch on 19.12.2015.
  */
-public abstract class Parser implements ParserHandler {
+public abstract class Parser {
 
     protected final Grammar grammar;
     protected final Table<String, String, Rule> parseTable;
@@ -66,4 +67,12 @@ public abstract class Parser implements ParserHandler {
     private boolean isReducible(String head, Token token) {
         return (grammar.isTerminal(head) || Grammar.END_SYMBOL.equals(head)) && token.identifier.equals(head);
     }
+
+    public abstract void onInitialize();
+
+    public abstract void onToken(Token token);
+
+    public abstract void onRule(Rule rule);
+
+    public abstract void onDone();
 }

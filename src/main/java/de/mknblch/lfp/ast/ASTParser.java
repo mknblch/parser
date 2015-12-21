@@ -4,7 +4,7 @@ import de.mknblch.lfp.common.Table;
 import de.mknblch.lfp.grammar.Grammar;
 import de.mknblch.lfp.grammar.Rule;
 import de.mknblch.lfp.lexer.Token;
-import de.mknblch.lfp.parser.Parser;
+import de.mknblch.lfp.parser.ll1.Parser;
 
 import java.util.Stack;
 
@@ -12,6 +12,8 @@ import java.util.Stack;
  * Created by mknblch on 21.12.2015.
  */
 public class ASTParser extends Parser {
+
+    private Node ast;
 
     public ASTParser(Grammar grammar, Table<String, String, Rule> parseTable) {
         super(grammar, parseTable);
@@ -47,51 +49,50 @@ public class ASTParser extends Parser {
         }
     }
 
-    private Stack<Element> queue;
+    private final Stack<Element> semanticStack = new Stack<>();
+
+    public Node getAst() {
+        return ast;
+    }
 
     @Override
     public void onInitialize() {
-        queue = new Stack<>();
+        semanticStack.clear();
     }
 
     @Override
     public void onToken(Token token) {
-        queue.push(new Element(token));
+        semanticStack.push(new Element(token));
     }
 
     @Override
     public void onRule(Rule rule) {
-        queue.push(new Element(rule));
+        semanticStack.push(new Element(rule));
     }
 
     @Override
     public void onDone() {
+        process();
+    }
 
-        dump(queue);
-
+    private void process() {
         final Stack<Node> nodes = new Stack<>();
-
         do {
-
-            final Element pop = queue.pop();
-
-            if (pop.isRule()) {
-
-                final RuleNode item = new RuleNode(pop.rule);
-
-                while (!item.isSatisfied()) {
-                    item.addChild(nodes.pop());
+            final Element head = semanticStack.pop();
+            if (head.isRule()) {
+                final RuleNode ruleNode = new RuleNode(head.rule); // TODO Epsilon Rule
+                if (!grammar.isEpsilon(ruleNode.getRule())) {
+                    while (!ruleNode.isSatisfied()) {
+                        ruleNode.addChild(nodes.pop());
+                    }
                 }
-
-
-                nodes.push(item);
+                nodes.push(ruleNode);
             } else {
-                nodes.push(new ValueNode(pop.token));
+                nodes.push(new ValueNode(head.token));
             }
 
-        } while (!queue.isEmpty());
-
-        dump(nodes);
+        } while (!semanticStack.isEmpty());
+        ast = nodes.pop();
     }
 
     private void dump(Stack stack) {

@@ -1,8 +1,10 @@
-package de.mknblch.lfp.parser;
+package de.mknblch.lfp.parser.ll1;
 
 import de.mknblch.lfp.common.Table;
 import de.mknblch.lfp.grammar.Grammar;
 import de.mknblch.lfp.grammar.Rule;
+import de.mknblch.lfp.parser.GrammarAggregator;
+import de.mknblch.lfp.parser.GrammarException;
 
 /**
  * @author martinknobloch

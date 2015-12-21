@@ -16,4 +16,9 @@ public class ValueNode implements Node {
     public Token getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return value.literal;
+    }
 }

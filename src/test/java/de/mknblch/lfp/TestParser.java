@@ -1,6 +1,7 @@
 package de.mknblch.lfp;
 
 import de.mknblch.lfp.ast.ASTParser;
+import de.mknblch.lfp.ast.Node;
 import de.mknblch.lfp.common.Table;
 import de.mknblch.lfp.grammar.Grammar;
 import de.mknblch.lfp.grammar.Rule;
@@ -8,9 +9,8 @@ import de.mknblch.lfp.lexer.Lexer;
 import de.mknblch.lfp.lexer.SyntaxException;
 import de.mknblch.lfp.lexer.Token;
 import de.mknblch.lfp.parser.GrammarException;
-import de.mknblch.lfp.parser.LL1ParseTableBuilder;
+import de.mknblch.lfp.parser.ll1.LL1ParseTableBuilder;
 import de.mknblch.lfp.parser.ParseException;
-import de.mknblch.lfp.parser.Parser;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class TestParser {
     private final Grammar grammar;
     private final Table<String, String, Rule> parseTable;
     private final Lexer lexer;
-    private final Parser astParser;
+    private final ASTParser astParser;
 
     public TestParser(Grammar grammar) throws GrammarException {
         this.grammar = grammar;
@@ -34,11 +34,12 @@ public class TestParser {
     }
 
 
-    public void parse(String input) throws SyntaxException, ParseException {
+    public Node parse(String input) throws SyntaxException, ParseException {
 
         final List<Token> tokens = lexer.tokenize(input);
 
         astParser.parse(tokens);
 
+        return astParser.getAst();
     }
 }
