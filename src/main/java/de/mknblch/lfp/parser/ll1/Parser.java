@@ -1,9 +1,13 @@
 package de.mknblch.lfp.parser.ll1;
 
+import de.mknblch.lfp.ast.Node;
+import de.mknblch.lfp.ast.RuleNode;
+import de.mknblch.lfp.ast.ValueNode;
 import de.mknblch.lfp.common.Table;
 import de.mknblch.lfp.grammar.Grammar;
 import de.mknblch.lfp.grammar.Rule;
 import de.mknblch.lfp.lexer.Token;
+import de.mknblch.lfp.parser.Element;
 import de.mknblch.lfp.parser.ParseException;
 
 import java.util.List;
@@ -12,25 +16,26 @@ import java.util.Stack;
 /**
  * Created by mknblch on 19.12.2015.
  */
-public abstract class Parser {
+public class Parser {
 
-    protected final Grammar grammar;
-    protected final Table<String, String, Rule> parseTable;
+    private final Grammar grammar;
+    private final Table<String, String, Rule> parseTable;
 
-    protected Parser(Grammar grammar, Table<String, String, Rule> parseTable) {
+
+    public Parser(Grammar grammar, Table<String, String, Rule> parseTable) {
         this.grammar = grammar;
         this.parseTable = parseTable;
     }
 
-    public void parse(List<Token> input) throws ParseException {
-        onInitialize();
+    public Node parse(List<Token> input) throws ParseException {
+        final Stack<Element> semanticStack = new Stack<>();
         final Stack<String> stack = prepareStack();
         for (int index = 0; index < input.size(); ) {
             final Token token = input.get(index);
             final String head = stack.pop();
             if (isReducible(head, token)) {
                 if (!Grammar.END_SYMBOL.equals(token.identifier)) {
-                    onToken(token);
+                    semanticStack.push(new Element(token));
                 }
                 index++;
                 continue;
@@ -40,20 +45,34 @@ public abstract class Parser {
                     throw new ParseException("Unable to parse " + token + " at " + index);
                 }
                 if (!grammar.isEpsilon(rule)) {
-                    pushReversed(stack, rule);
+                    pushReversed(stack, rule.right());
                 }
-                onRule(rule);
+                semanticStack.push(new Element(rule));
                 continue;
             }
             throw new ParseException("Unable to parse " + token + " at " + index);
         }
-        onDone();
+        return createSyntaxTree(semanticStack);
     }
 
-    private void pushReversed(Stack<String> stack, Rule rule) {
-        for (int j = rule.size() - 1; j >= 0; j--) {
-            stack.push(rule.get(j));
-        }
+    private Node createSyntaxTree(Stack<Element> semanticStack) {
+        final Stack<Node> nodes = new Stack<>();
+        do {
+            final Element head = semanticStack.pop();
+            if (head.isRule()) {
+                final RuleNode ruleNode = new RuleNode(head.rule); // TODO Epsilon Rule
+                if (!grammar.isEpsilon(ruleNode.getRule())) {
+                    while (!ruleNode.isSatisfied()) {
+                        ruleNode.addChild(nodes.pop());
+                    }
+                }
+                nodes.push(ruleNode);
+            } else {
+                nodes.push(new ValueNode(head.token));
+            }
+
+        } while (!semanticStack.isEmpty());
+        return nodes.pop();
     }
 
     private Stack<String> prepareStack() {
@@ -68,11 +87,9 @@ public abstract class Parser {
         return (grammar.isTerminal(head) || Grammar.END_SYMBOL.equals(head)) && token.identifier.equals(head);
     }
 
-    public abstract void onInitialize();
-
-    public abstract void onToken(Token token);
-
-    public abstract void onRule(Rule rule);
-
-    public abstract void onDone();
+    private static void pushReversed(Stack<String> stack, List<String> production) {
+        for (int j = production.size() - 1; j >= 0; j--) {
+            stack.push(production.get(j));
+        }
+    }
 }

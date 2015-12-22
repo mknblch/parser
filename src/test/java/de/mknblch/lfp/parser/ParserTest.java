@@ -27,7 +27,7 @@ public class ParserTest {
     public void testParse() throws Exception {
 
 
-        System.out.println(new TestParser(bnf).parse("aaaabaa"));
+        System.out.println(new TestParser(bnf).parse("aaaaaabaaa"));
 
     }
 }
