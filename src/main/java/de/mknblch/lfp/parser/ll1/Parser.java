@@ -1,8 +1,8 @@
 package de.mknblch.lfp.parser.ll1;
 
-import de.mknblch.lfp.ast.Node;
-import de.mknblch.lfp.ast.RuleNode;
-import de.mknblch.lfp.ast.ValueNode;
+import de.mknblch.lfp.parser.ast.Node;
+import de.mknblch.lfp.parser.ast.RuleNode;
+import de.mknblch.lfp.parser.ast.ValueNode;
 import de.mknblch.lfp.common.Table;
 import de.mknblch.lfp.grammar.Grammar;
 import de.mknblch.lfp.grammar.Rule;

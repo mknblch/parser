@@ -1,6 +1,6 @@
 package de.mknblch.lfp;
 
-import de.mknblch.lfp.ast.Node;
+import de.mknblch.lfp.parser.ast.Node;
 import de.mknblch.lfp.common.Table;
 import de.mknblch.lfp.grammar.Grammar;
 import de.mknblch.lfp.grammar.Rule;

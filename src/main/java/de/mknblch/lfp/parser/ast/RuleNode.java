@@ -1,4 +1,4 @@
-package de.mknblch.lfp.ast;
+package de.mknblch.lfp.parser.ast;
 
 import de.mknblch.lfp.grammar.Rule;
 

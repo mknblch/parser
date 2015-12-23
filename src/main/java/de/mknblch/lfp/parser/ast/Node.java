@@ -1,6 +1,4 @@
-package de.mknblch.lfp.ast;
-
-import java.util.List;
+package de.mknblch.lfp.parser.ast;
 
 /**
  * Created by mknblch on 19.12.2015.
