@@ -16,9 +16,9 @@ import java.util.stream.Stream;
 /**
  * Created by mknblch on 04.12.2015.
  */
-public class GrammarReader {
+public class GrammarLoader {
 
-    private static final GrammarReader INSTANCE = new GrammarReader();
+    private static final GrammarLoader INSTANCE = new GrammarLoader();
 
     public static final String DELIMITER = "::=";
     public static final String EXCLUDE_PREFIX = "~";
@@ -31,7 +31,7 @@ public class GrammarReader {
     private static final Pattern LINE_PATTERN =
             Pattern.compile("([^:= ]+)\\s*"+DELIMITER+"\\s*(.+)");
 
-    private Map<String, String> preProcess(InputStream iStream) throws GrammarReaderException {
+    private Map<String, String> preProcess(InputStream iStream) throws GrammarLoaderException {
         final Scanner scanner = new Scanner(iStream)
                 .useDelimiter(Pattern.compile("(\r?\n)+"));
         final Map<String, String> cache = new HashMap<>();
@@ -42,14 +42,14 @@ public class GrammarReader {
             }
             final Matcher matcher = LINE_PATTERN.matcher(line);
             if (!matcher.matches()) {
-                throw new GrammarReaderException("Error at : " + line);
+                throw new GrammarLoaderException("Error at : " + line);
             }
             cache.put(matcher.group(1), matcher.group(2));
         }
         return cache;
     }
 
-    public Grammar readGrammar(InputStream inputStream) throws GrammarReaderException {
+    public Grammar readGrammar(InputStream inputStream) throws GrammarLoaderException {
 
         final Map<String, String> cache = preProcess(inputStream);
 
@@ -66,25 +66,30 @@ public class GrammarReader {
                 ruleMap);
     }
 
-    public static Grammar readFromString(String input) throws GrammarReaderException {
+    public static Grammar readFromString(String input) throws GrammarLoaderException {
         return INSTANCE.readGrammar(new ByteArrayInputStream(input.getBytes(Charset.defaultCharset())));
     }
 
-    public static Grammar readFromString(String input, Charset charset) throws GrammarReaderException {
+    public static Grammar readFromString(String input, Charset charset) throws GrammarLoaderException {
         return INSTANCE.readGrammar(new ByteArrayInputStream(input.getBytes(charset)));
     }
 
-    public static Grammar load(Path path) throws IOException, GrammarReaderException {
-        final InputStream iStream = Files.newInputStream(path, StandardOpenOption.READ);
+    public static Grammar load(Path path) throws GrammarLoaderException {
+        final InputStream iStream;
+        try {
+            iStream = Files.newInputStream(path, StandardOpenOption.READ);
+        } catch (IOException e) {
+            throw new GrammarLoaderException("Could not load Grammar.", e);
+        }
         return INSTANCE.readGrammar(iStream);
     }
 
-    public static Grammar loadResource(String resource) throws GrammarReaderException {
+    public static Grammar loadResource(String resource) throws GrammarLoaderException {
         final InputStream iStream = Thread
                 .currentThread()
                 .getContextClassLoader()
                 .getResourceAsStream(resource);
-        return new GrammarReader().readGrammar(iStream);
+        return new GrammarLoader().readGrammar(iStream);
     }
 
     private Map<String, String> makeProperties(Map<String, String> cache) {

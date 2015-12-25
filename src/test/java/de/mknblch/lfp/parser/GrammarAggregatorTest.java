@@ -2,8 +2,8 @@ package de.mknblch.lfp.parser;
 
 
 import de.mknblch.lfp.grammar.Grammar;
-import de.mknblch.lfp.grammar.GrammarReader;
-import de.mknblch.lfp.grammar.GrammarReaderException;
+import de.mknblch.lfp.grammar.GrammarLoader;
+import de.mknblch.lfp.grammar.GrammarLoaderException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -24,10 +24,10 @@ public class GrammarAggregatorTest {
     private static Grammar bnf4, bnf5, err;
 
     @BeforeClass
-    public static void init() throws  GrammarReaderException {
-        bnf4 = GrammarReader.loadResource("bnf4.lng");
-        bnf5 = GrammarReader.loadResource("bnf5.lng");
-        err = GrammarReader.loadResource("err.lng");
+    public static void init() throws GrammarLoaderException {
+        bnf4 = GrammarLoader.loadResource("bnf4.lng");
+        bnf5 = GrammarLoader.loadResource("bnf5.lng");
+        err = GrammarLoader.loadResource("err.lng");
     }
 
     @Test

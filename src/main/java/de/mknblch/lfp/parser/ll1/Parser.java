@@ -1,16 +1,17 @@
 package de.mknblch.lfp.parser.ll1;
 
-import de.mknblch.lfp.lexer.SyntaxException;
-import de.mknblch.lfp.lexer.TokenStream;
-import de.mknblch.lfp.parser.ast.Node;
-import de.mknblch.lfp.parser.ast.RuleNode;
-import de.mknblch.lfp.parser.ast.ValueNode;
 import de.mknblch.lfp.common.Table;
 import de.mknblch.lfp.grammar.Grammar;
 import de.mknblch.lfp.grammar.Production;
+import de.mknblch.lfp.lexer.Lexer;
+import de.mknblch.lfp.lexer.SyntaxException;
 import de.mknblch.lfp.lexer.Token;
+import de.mknblch.lfp.lexer.TokenStream;
 import de.mknblch.lfp.parser.Element;
 import de.mknblch.lfp.parser.ParseException;
+import de.mknblch.lfp.parser.ast.Node;
+import de.mknblch.lfp.parser.ast.RuleNode;
+import de.mknblch.lfp.parser.ast.ValueNode;
 
 import java.util.List;
 import java.util.Stack;
@@ -29,21 +30,28 @@ public class Parser {
         this.parseTable = parseTable;
     }
 
-    public Node parse(TokenStream tokenStream) throws ParseException, SyntaxException {
+    public Node parse(CharSequence input) throws ParseException, SyntaxException {
         final Stack<Element> semanticStack = new Stack<>();
         final Stack<String> stack = prepareStack();
+        final TokenStream tokenStream = new Lexer(grammar).buildStream(input);
+        tokenStream.next();
         do {
             final String head = stack.pop();
-            if (isReducible(head)) {
-                final Token token = tokenStream.next();
+            final Token token = tokenStream.current();
 
+            if (null == token) {
+                throw new ParseException("Premature End at " + (tokenStream.getOffset()));
+            } else if (grammar.isTerminal(head)) {
+                if (!head.equals(token.identifier)) {
+                    throw new ParseException("Unable to parse " + head + " at " + tokenStream.getOffset());
+                }
                 semanticStack.push(new Element(token));
-                index++;
+                tokenStream.next();
                 continue;
-            } else if (grammar.isNonTerminal(head)) {
-                final Production production = parseTable.get(head, head);
+            } else {
+                final Production production = parseTable.get(head, token.identifier);
                 if (null == production) {
-                    throw new ParseException("Unable to parse " + head + " at " + index);
+                    throw new ParseException("Unable to parse " + head + " at " + tokenStream.getOffset());
                 }
                 if (!grammar.isEpsilon(production)) {
                     pushReversed(stack, production.right());
@@ -51,8 +59,15 @@ public class Parser {
                 semanticStack.push(new Element(production));
                 continue;
             }
-            throw new ParseException("Unable to parse " + head + " at " + index);
+
+
         } while (!stack.isEmpty());
+
+        if (tokenStream.hasNext()) {
+            throw new ParseException("Unable to parse " + tokenStream.current() + " at " + tokenStream.getOffset());
+
+        }
+
         return createSyntaxTree(semanticStack);
     }
 
@@ -78,8 +93,6 @@ public class Parser {
 
     private Stack<String> prepareStack() {
         final Stack<String> stack = new Stack<>();
-        stack.clear();
-        stack.push(Grammar.END_SYMBOL);
         stack.push(grammar.getStartSymbol());
         return stack;
     }

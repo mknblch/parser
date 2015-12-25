@@ -7,20 +7,13 @@ import de.mknblch.lfp.grammar.Grammar;
  */
 public class Lexer {
 
-    private Grammar grammar;
-    private CharSequence input;
+    private final Grammar grammar;
 
-    public Lexer setGrammar(Grammar grammar) {
+    public Lexer(Grammar grammar) {
         this.grammar = grammar;
-        return this;
     }
 
-    public Lexer setInput(CharSequence charSequence) {
-        this.input = charSequence;
-        return this;
-    }
-
-    public TokenStream build() {
-        return new TokenStream(input, grammar.getPatternMap(), grammar.getExclusionMap());
+    public TokenStream buildStream(CharSequence input) {
+        return new TokenStream(grammar, input);
     }
 }
