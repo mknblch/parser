@@ -6,9 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 
-import java.util.List;
-
-import static org.junit.Assert.*;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -28,11 +25,15 @@ public class LexerTest {
     @Test
     public void testTokenize() throws Exception {
 
-        final Lexer lexer = new Lexer(grammar);
+        final TmpLexer lexer = new TmpLexer(grammar);
 
-        final List<Token> tokens = lexer.tokenize("hallo(25);\twelt()");
-        LOGGER.debug("Tokens {}", tokens);
-        assertEquals(8, tokens.size());
+        lexer.setInput("hallo(25);\twelt()");
+
+        lexer.arm(grammar.getPatternMap());
+
+        while (lexer.hasToken()) {
+            System.out.println(lexer.nextToken());
+        }
     }
 
 }

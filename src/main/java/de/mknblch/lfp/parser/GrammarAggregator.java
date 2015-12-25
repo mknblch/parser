@@ -2,7 +2,7 @@ package de.mknblch.lfp.parser;
 
 import de.mknblch.lfp.common.Bag;
 import de.mknblch.lfp.grammar.Grammar;
-import de.mknblch.lfp.grammar.Rule;
+import de.mknblch.lfp.grammar.Production;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class GrammarAggregator {
 
-    private final Bag<Rule, String> firstRules;
+    private final Bag<Production, String> firstRules;
     private final Bag<String, String> firstSet;
     private final Bag<String, String> followSet;
     private final Set<String> nullable;
@@ -35,8 +35,8 @@ public class GrammarAggregator {
         return this;
     }
 
-    public Set<String> first(Rule rule) {
-        return firstRules.get(rule);
+    public Set<String> first(Production production) {
+        return firstRules.get(production);
     }
 
     public Set<String> follow(String symbol) {
@@ -51,7 +51,7 @@ public class GrammarAggregator {
         return firstSet;
     }
 
-    public Bag<Rule, String> getFirstRules() {
+    public Bag<Production, String> getFirstRules() {
         return firstRules;
     }
 
@@ -78,23 +78,23 @@ public class GrammarAggregator {
             if i+1=j or {Y(i+1),...,Y(j-1)} subset of nullable then
                 follow(Y(i)) add all of first(Y(j))
      */
-    private void process(Rule rule) {
+    private void process(Production production) {
 
-        if (grammar.isEpsilon(rule) || nullable.containsAll(rule.right())) {
-            addNullable(rule.left());
+        if (grammar.isEpsilon(production) || nullable.containsAll(production.right())) {
+            addNullable(production.left());
         }
-        final int k = rule.size();
+        final int k = production.size();
         for (int i = 0; i < k; i++) {
-            final String symbol = rule.get(i);
-            if (i == 0 || nullable.containsAll(rule.right().subList(0, i))) {
-                addFirst(rule, firstSet.get(symbol));
+            final String symbol = production.get(i);
+            if (i == 0 || nullable.containsAll(production.right().subList(0, i))) {
+                addFirst(production, firstSet.get(symbol));
             }
-            if (i == k || nullable.containsAll(rule.right().subList(i + 1, k))) {
-                addFollow(symbol, followSet.get(rule.left()));
+            if (i == k || nullable.containsAll(production.right().subList(i + 1, k))) {
+                addFollow(symbol, followSet.get(production.left()));
             }
             for (int j = i + 1; j < k; j++) {
-                if (i + 1 == j || nullable.containsAll(rule.right().subList(i + 1, j))) {
-                    addFollow(symbol, firstSet.get(rule.get(j)));
+                if (i + 1 == j || nullable.containsAll(production.right().subList(i + 1, j))) {
+                    addFollow(symbol, firstSet.get(production.get(j)));
                 }
             }
         }
@@ -129,9 +129,9 @@ public class GrammarAggregator {
         changed |= nullable.add(symbol);
     }
 
-    private void addFirst(Rule rule, Collection<String> firsts) {
-        changed |= firstSet.putAll(rule.left(), firsts);
-        firstRules.putAll(rule, firsts);
+    private void addFirst(Production production, Collection<String> firsts) {
+        changed |= firstSet.putAll(production.left(), firsts);
+        firstRules.putAll(production, firsts);
     }
 
     private void addFollow(String symbol, Collection<String> firsts) {

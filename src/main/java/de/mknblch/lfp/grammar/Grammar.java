@@ -5,8 +5,6 @@ import de.mknblch.lfp.common.DumpHelper;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * Created by mknblch on 05.12.2015.
@@ -19,11 +17,11 @@ public class Grammar {
     private final String epsilonSymbol;
     private final Map<String, Pattern> exclusionMap;
     private final Map<String, Pattern> patternMap;
-    private final Map<String, List<Rule>> ruleMap;
+    private final Map<String, List<Production>> ruleMap;
 
     public Grammar(String startSymbol,
                    String epsilonSymbol, Map<String, Pattern> exclusionMap, Map<String, Pattern> patternMap,
-                   Map<String, List<Rule>> ruleMap) {
+                   Map<String, List<Production>> ruleMap) {
 
         this.startSymbol = startSymbol;
         this.epsilonSymbol = epsilonSymbol;
@@ -36,8 +34,8 @@ public class Grammar {
         return epsilonSymbol.equals(symbol);
     }
 
-    public boolean isEpsilon(Rule rule) {
-        return rule.size() == 1 && epsilonSymbol.equals(rule.get(0));
+    public boolean isEpsilon(Production production) {
+        return production.size() == 1 && epsilonSymbol.equals(production.get(0));
     }
 
     public boolean isTerminal(String symbol) {
@@ -61,7 +59,7 @@ public class Grammar {
         return END_SYMBOL.equals(symbol) || isTerminal(symbol) || isNonTerminal(symbol);
     }
 
-    public List<Rule> rules() {
+    public List<Production> rules() {
         return ruleMap.values().stream()
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
@@ -83,7 +81,7 @@ public class Grammar {
         return patternMap;
     }
 
-    public Map<String, List<Rule>> getRuleMap() {
+    public Map<String, List<Production>> getRuleMap() {
         return ruleMap;
     }
 

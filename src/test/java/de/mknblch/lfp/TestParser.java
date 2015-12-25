@@ -3,8 +3,8 @@ package de.mknblch.lfp;
 import de.mknblch.lfp.parser.ast.Node;
 import de.mknblch.lfp.common.Table;
 import de.mknblch.lfp.grammar.Grammar;
-import de.mknblch.lfp.grammar.Rule;
-import de.mknblch.lfp.lexer.Lexer;
+import de.mknblch.lfp.grammar.Production;
+import de.mknblch.lfp.lexer.TmpLexer;
 import de.mknblch.lfp.lexer.SyntaxException;
 import de.mknblch.lfp.lexer.Token;
 import de.mknblch.lfp.parser.GrammarException;
@@ -19,14 +19,14 @@ import java.util.List;
  */
 public class TestParser {
 
-    private final Table<String, String, Rule> parseTable;
-    private final Lexer lexer;
+    private final Table<String, String, Production> parseTable;
+    private final TmpLexer lexer;
     private final Parser astParser;
 
     public TestParser(Grammar grammar) throws GrammarException {
         parseTable = new LL1ParseTableBuilder(grammar).build();
         astParser = new Parser(grammar, parseTable);
-        lexer = new Lexer(grammar);
+        lexer = new TmpLexer(grammar);
 
         System.out.println(grammar);
     }

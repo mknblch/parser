@@ -56,7 +56,7 @@ public class GrammarReader {
         final Map<String, String> properties = makeProperties(cache);
         final Map<String, Pattern> patternMap = makePatternMap(cache);
         final Map<String, Pattern> exclusionMap = makeExclusionMap(cache);
-        final Map<String, List<Rule>> ruleMap = makeRuleBag(cache);
+        final Map<String, List<Production>> ruleMap = makeRuleBag(cache);
 
         return new Grammar(
                 properties.get(START_OPTION),
@@ -116,7 +116,7 @@ public class GrammarReader {
      * @param cache
      * @return
      */
-    private Map<String, List<Rule>> makeRuleBag(Map<String, String> cache) {
+    private Map<String, List<Production>> makeRuleBag(Map<String, String> cache) {
         return cache.entrySet().stream()
                 // filter non terminals
                 .filter(this::isNonTerminal)
@@ -128,7 +128,7 @@ public class GrammarReader {
      * @param entry
      * @return
      */
-    private List<Rule> makeRuleList(Map.Entry<String, String> entry) {
+    private List<Production> makeRuleList(Map.Entry<String, String> entry) {
 
         final Pattern symbolSplitter = Pattern.compile("\\s+");
         final Pattern ruleSplitter = Pattern.compile("\\s*\\|\\s*");
@@ -136,7 +136,7 @@ public class GrammarReader {
         return Stream.of(ruleSplitter.split(entry.getValue()))
                 .map(symbolSplitter::split)
                 .map(Arrays::asList)
-                .map(l -> new Rule(entry.getKey(), l))
+                .map(l -> new Production(entry.getKey(), l))
                 .collect(Collectors.toList());
     }
 
