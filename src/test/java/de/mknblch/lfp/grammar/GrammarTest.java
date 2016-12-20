@@ -1,6 +1,5 @@
 package de.mknblch.lfp.grammar;
 
-import de.mknblch.lfp.parser.GrammarException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -21,10 +20,10 @@ public class GrammarTest {
     private static Grammar bnf4, bnf5, bnf6;
 
     @BeforeClass
-    public static void init() throws  GrammarReaderException {
-        bnf4 = GrammarReader.loadResource("bnf4.lng");
-        bnf5 = GrammarReader.loadResource("bnf5.lng");
-        bnf6 = GrammarReader.loadResource("bnf6.lng");
+    public static void init() throws GrammarLoaderException {
+        bnf4 = GrammarLoader.loadResource("bnf4.lng");
+        bnf5 = GrammarLoader.loadResource("bnf5.lng");
+        bnf6 = GrammarLoader.loadResource("bnf6.lng");
     }
 
     @Test

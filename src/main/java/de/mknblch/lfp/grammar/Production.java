@@ -6,12 +6,12 @@ import java.util.List;
 /**
  * @author martinknobloch
  */
-public class Rule implements Iterable<String> {
+public class Production implements Iterable<String> {
 
     private final String left;
     private final List<String> right;
 
-    public Rule(String left, List<String> right) {
+    public Production(String left, List<String> right) {
         this.left = left;
         this.right = right;
     }

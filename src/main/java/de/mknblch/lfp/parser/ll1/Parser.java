@@ -1,14 +1,17 @@
 package de.mknblch.lfp.parser.ll1;
 
+import de.mknblch.lfp.common.Table;
+import de.mknblch.lfp.grammar.Grammar;
+import de.mknblch.lfp.grammar.Production;
+import de.mknblch.lfp.lexer.Lexer;
+import de.mknblch.lfp.lexer.SyntaxException;
+import de.mknblch.lfp.lexer.Token;
+import de.mknblch.lfp.lexer.TokenStream;
+import de.mknblch.lfp.parser.Element;
+import de.mknblch.lfp.parser.ParseException;
 import de.mknblch.lfp.parser.ast.Node;
 import de.mknblch.lfp.parser.ast.RuleNode;
 import de.mknblch.lfp.parser.ast.ValueNode;
-import de.mknblch.lfp.common.Table;
-import de.mknblch.lfp.grammar.Grammar;
-import de.mknblch.lfp.grammar.Rule;
-import de.mknblch.lfp.lexer.Token;
-import de.mknblch.lfp.parser.Element;
-import de.mknblch.lfp.parser.ParseException;
 
 import java.util.List;
 import java.util.Stack;
@@ -19,39 +22,52 @@ import java.util.Stack;
 public class Parser {
 
     private final Grammar grammar;
-    private final Table<String, String, Rule> parseTable;
+    private final Table<String, String, Production> parseTable;
 
 
-    public Parser(Grammar grammar, Table<String, String, Rule> parseTable) {
+    public Parser(Grammar grammar, Table<String, String, Production> parseTable) {
         this.grammar = grammar;
         this.parseTable = parseTable;
     }
 
-    public Node parse(List<Token> input) throws ParseException {
+    public Node parse(CharSequence input) throws ParseException, SyntaxException {
         final Stack<Element> semanticStack = new Stack<>();
         final Stack<String> stack = prepareStack();
-        for (int index = 0; index < input.size(); ) {
-            final Token token = input.get(index);
+        final TokenStream tokenStream = new Lexer(grammar).buildStream(input);
+        tokenStream.next();
+        do {
             final String head = stack.pop();
-            if (isReducible(head, token)) {
-                if (!Grammar.END_SYMBOL.equals(token.identifier)) {
-                    semanticStack.push(new Element(token));
+            final Token token = tokenStream.current();
+
+            if (null == token) {
+                throw new ParseException("Premature End at " + (tokenStream.getOffset()));
+            } else if (grammar.isTerminal(head)) {
+                if (!head.equals(token.identifier)) {
+                    throw new ParseException("Unable to parse " + head + " at " + tokenStream.getOffset());
                 }
-                index++;
+                semanticStack.push(new Element(token));
+                tokenStream.next();
                 continue;
-            } else if (grammar.isNonTerminal(head)) {
-                final Rule rule = parseTable.get(head, token.identifier);
-                if (null == rule) {
-                    throw new ParseException("Unable to parse " + token + " at " + index);
+            } else {
+                final Production production = parseTable.get(head, token.identifier);
+                if (null == production) {
+                    throw new ParseException("Unable to parse " + head + " at " + tokenStream.getOffset());
                 }
-                if (!grammar.isEpsilon(rule)) {
-                    pushReversed(stack, rule.right());
+                if (!grammar.isEpsilon(production)) {
+                    pushReversed(stack, production.right());
                 }
-                semanticStack.push(new Element(rule));
+                semanticStack.push(new Element(production));
                 continue;
             }
-            throw new ParseException("Unable to parse " + token + " at " + index);
+
+
+        } while (!stack.isEmpty());
+
+        if (tokenStream.hasNext()) {
+            throw new ParseException("Unable to parse " + tokenStream.current() + " at " + tokenStream.getOffset());
+
         }
+
         return createSyntaxTree(semanticStack);
     }
 
@@ -60,7 +76,7 @@ public class Parser {
         do {
             final Element head = semanticStack.pop();
             if (head.isRule()) {
-                final RuleNode ruleNode = new RuleNode(head.rule); // TODO Epsilon Rule
+                final RuleNode ruleNode = new RuleNode(head.production); // TODO Epsilon Rule
                 if (!grammar.isEpsilon(ruleNode.getRule())) {
                     while (!ruleNode.isSatisfied()) {
                         ruleNode.addChild(nodes.pop());
@@ -77,14 +93,12 @@ public class Parser {
 
     private Stack<String> prepareStack() {
         final Stack<String> stack = new Stack<>();
-        stack.clear();
-        stack.push(Grammar.END_SYMBOL);
         stack.push(grammar.getStartSymbol());
         return stack;
     }
 
-    private boolean isReducible(String head, Token token) {
-        return (grammar.isTerminal(head) || Grammar.END_SYMBOL.equals(head)) && token.identifier.equals(head);
+    private boolean isReducible(String head) {
+        return grammar.isTerminal(head) ;
     }
 
     private static void pushReversed(Stack<String> stack, List<String> production) {

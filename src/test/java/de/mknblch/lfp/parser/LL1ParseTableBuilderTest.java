@@ -1,8 +1,8 @@
 package de.mknblch.lfp.parser;
 
 import de.mknblch.lfp.grammar.Grammar;
-import de.mknblch.lfp.grammar.GrammarReader;
-import de.mknblch.lfp.grammar.GrammarReaderException;
+import de.mknblch.lfp.grammar.GrammarLoader;
+import de.mknblch.lfp.grammar.GrammarLoaderException;
 import de.mknblch.lfp.parser.ll1.LL1ParseTableBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,13 +20,13 @@ public class LL1ParseTableBuilderTest {
     private static Grammar bnf1, bnf2, bnf3, bnf4, bnf5, bnf6;
 
     @BeforeClass
-    public static void init() throws GrammarReaderException {
-        bnf1 = GrammarReader.loadResource("bnf.lng");
-        bnf2 = GrammarReader.loadResource("bnf2.lng");
-        bnf3 = GrammarReader.loadResource("bnf3.lng");
-        bnf4 = GrammarReader.loadResource("bnf4.lng");
-        bnf5 = GrammarReader.loadResource("bnf5.lng");
-        bnf6 = GrammarReader.loadResource("bnf6.lng");
+    public static void init() throws GrammarLoaderException {
+        bnf1 = GrammarLoader.loadResource("bnf.lng");
+        bnf2 = GrammarLoader.loadResource("bnf2.lng");
+        bnf3 = GrammarLoader.loadResource("bnf3.lng");
+        bnf4 = GrammarLoader.loadResource("bnf4.lng");
+        bnf5 = GrammarLoader.loadResource("bnf5.lng");
+        bnf6 = GrammarLoader.loadResource("bnf6.lng");
     }
 
     @Test

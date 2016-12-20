@@ -16,9 +16,9 @@ import java.util.stream.Stream;
 /**
  * Created by mknblch on 04.12.2015.
  */
-public class GrammarReader {
+public class GrammarLoader {
 
-    private static final GrammarReader INSTANCE = new GrammarReader();
+    private static final GrammarLoader INSTANCE = new GrammarLoader();
 
     public static final String DELIMITER = "::=";
     public static final String EXCLUDE_PREFIX = "~";
@@ -31,7 +31,7 @@ public class GrammarReader {
     private static final Pattern LINE_PATTERN =
             Pattern.compile("([^:= ]+)\\s*"+DELIMITER+"\\s*(.+)");
 
-    private Map<String, String> preProcess(InputStream iStream) throws GrammarReaderException {
+    private Map<String, String> preProcess(InputStream iStream) throws GrammarLoaderException {
         final Scanner scanner = new Scanner(iStream)
                 .useDelimiter(Pattern.compile("(\r?\n)+"));
         final Map<String, String> cache = new HashMap<>();
@@ -42,21 +42,21 @@ public class GrammarReader {
             }
             final Matcher matcher = LINE_PATTERN.matcher(line);
             if (!matcher.matches()) {
-                throw new GrammarReaderException("Error at : " + line);
+                throw new GrammarLoaderException("Error at : " + line);
             }
             cache.put(matcher.group(1), matcher.group(2));
         }
         return cache;
     }
 
-    public Grammar readGrammar(InputStream inputStream) throws GrammarReaderException {
+    public Grammar readGrammar(InputStream inputStream) throws GrammarLoaderException {
 
         final Map<String, String> cache = preProcess(inputStream);
 
         final Map<String, String> properties = makeProperties(cache);
         final Map<String, Pattern> patternMap = makePatternMap(cache);
         final Map<String, Pattern> exclusionMap = makeExclusionMap(cache);
-        final Map<String, List<Rule>> ruleMap = makeRuleBag(cache);
+        final Map<String, List<Production>> ruleMap = makeRuleBag(cache);
 
         return new Grammar(
                 properties.get(START_OPTION),
@@ -66,25 +66,30 @@ public class GrammarReader {
                 ruleMap);
     }
 
-    public static Grammar readFromString(String input) throws GrammarReaderException {
+    public static Grammar readFromString(String input) throws GrammarLoaderException {
         return INSTANCE.readGrammar(new ByteArrayInputStream(input.getBytes(Charset.defaultCharset())));
     }
 
-    public static Grammar readFromString(String input, Charset charset) throws GrammarReaderException {
+    public static Grammar readFromString(String input, Charset charset) throws GrammarLoaderException {
         return INSTANCE.readGrammar(new ByteArrayInputStream(input.getBytes(charset)));
     }
 
-    public static Grammar load(Path path) throws IOException, GrammarReaderException {
-        final InputStream iStream = Files.newInputStream(path, StandardOpenOption.READ);
+    public static Grammar load(Path path) throws GrammarLoaderException {
+        final InputStream iStream;
+        try {
+            iStream = Files.newInputStream(path, StandardOpenOption.READ);
+        } catch (IOException e) {
+            throw new GrammarLoaderException("Could not load Grammar.", e);
+        }
         return INSTANCE.readGrammar(iStream);
     }
 
-    public static Grammar loadResource(String resource) throws GrammarReaderException {
+    public static Grammar loadResource(String resource) throws GrammarLoaderException {
         final InputStream iStream = Thread
                 .currentThread()
                 .getContextClassLoader()
                 .getResourceAsStream(resource);
-        return new GrammarReader().readGrammar(iStream);
+        return new GrammarLoader().readGrammar(iStream);
     }
 
     private Map<String, String> makeProperties(Map<String, String> cache) {
@@ -116,7 +121,7 @@ public class GrammarReader {
      * @param cache
      * @return
      */
-    private Map<String, List<Rule>> makeRuleBag(Map<String, String> cache) {
+    private Map<String, List<Production>> makeRuleBag(Map<String, String> cache) {
         return cache.entrySet().stream()
                 // filter non terminals
                 .filter(this::isNonTerminal)
@@ -128,7 +133,7 @@ public class GrammarReader {
      * @param entry
      * @return
      */
-    private List<Rule> makeRuleList(Map.Entry<String, String> entry) {
+    private List<Production> makeRuleList(Map.Entry<String, String> entry) {
 
         final Pattern symbolSplitter = Pattern.compile("\\s+");
         final Pattern ruleSplitter = Pattern.compile("\\s*\\|\\s*");
@@ -136,7 +141,7 @@ public class GrammarReader {
         return Stream.of(ruleSplitter.split(entry.getValue()))
                 .map(symbolSplitter::split)
                 .map(Arrays::asList)
-                .map(l -> new Rule(entry.getKey(), l))
+                .map(l -> new Production(entry.getKey(), l))
                 .collect(Collectors.toList());
     }
 

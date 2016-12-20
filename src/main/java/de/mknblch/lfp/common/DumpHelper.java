@@ -1,7 +1,7 @@
 package de.mknblch.lfp.common;
 
 import de.mknblch.lfp.grammar.Grammar;
-import de.mknblch.lfp.grammar.Rule;
+import de.mknblch.lfp.grammar.Production;
 
 import java.util.List;
 
@@ -47,14 +47,14 @@ public class DumpHelper {
     }
 
     private static String getRuleDump(Grammar grammar, String nonTerminal) {
-        final List<Rule> rules = grammar.getRuleMap().get(nonTerminal);
+        final List<Production> productions = grammar.getRuleMap().get(nonTerminal);
         final StringBuilder buffer = new StringBuilder();
 
-        for (Rule rule : rules) {
+        for (Production production : productions) {
             if (buffer.length() != 0) {
                 buffer.append(" | ");
             }
-            buffer.append(String.join(" ", rule.right()));
+            buffer.append(String.join(" ", production.right()));
         }
         return buffer.toString();
     }

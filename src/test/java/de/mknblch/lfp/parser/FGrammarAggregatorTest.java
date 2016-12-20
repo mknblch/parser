@@ -1,8 +1,8 @@
 package de.mknblch.lfp.parser;
 
 import de.mknblch.lfp.grammar.Grammar;
-import de.mknblch.lfp.grammar.GrammarReader;
-import de.mknblch.lfp.grammar.GrammarReaderException;
+import de.mknblch.lfp.grammar.GrammarLoader;
+import de.mknblch.lfp.grammar.GrammarLoaderException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -19,8 +19,8 @@ public class FGrammarAggregatorTest {
     private static Grammar bnf;
 
     @BeforeClass
-    public static void init() throws GrammarReaderException {
-        bnf = GrammarReader.loadResource("bnf5.lng");
+    public static void init() throws GrammarLoaderException {
+        bnf = GrammarLoader.loadResource("bnf5.lng");
     }
 
     @Test
